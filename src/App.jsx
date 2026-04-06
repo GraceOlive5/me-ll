@@ -846,15 +846,14 @@ function CalView({ periods, stats, setPeriods }) {
                 <div style={{ padding:"12px 14px", background:PHASES[0].soft, borderRadius:12, fontSize:12, color:PHASES[0].text }}>
                   기록된 생리: {fmtKo(modal.period.start)}{modal.period.end ? ` ~ ${fmtKo(modal.period.end)}` : " (종료일 없음)"}
                 </div>
-                {!modal.period.end && (
-                  <button onClick={() => addEnd(modal.ds)} style={{
-                    padding:"14px", background:C.card,
-                    border:`1.5px solid ${C.border}`, borderRadius:14,
-                    fontSize:14, fontWeight:600, color:C.text, cursor:"pointer",
-                  }}>
-                    ✓ 이 날을 종료일로 기록
-                  </button>
-                )}
+                {/* 종료일 변경 — 현재 날짜로 직접 수정 */}
+                <button onClick={() => editEnd(modal.period.id, modal.ds)} style={{
+                  padding:"14px", background:C.card,
+                  border:`1.5px solid ${C.border}`, borderRadius:14,
+                  fontSize:14, fontWeight:600, color:C.text, cursor:"pointer",
+                }}>
+                  ✓ 종료일을 {fmtKo(modal.ds)}로 변경
+                </button>
                 <button onClick={() => deletePeriod(modal.period.id)} style={{
                   padding:"14px", background:"#FEF2F2",
                   border:"1.5px solid #FECACA", borderRadius:14,
