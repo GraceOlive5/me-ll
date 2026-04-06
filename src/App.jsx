@@ -602,8 +602,10 @@ function CalView({ periods, stats, setPeriods }) {
   function getDayPhase(ds) {
     if (!periods.length) return null;
     const sorted = [...periods].sort((a, b) => toDate(b.start) - toDate(a.start));
-    const diff = daysBetween(sorted[0].start, ds);
-    if (diff < 0) return null;
+    // 해당 날짜보다 이전이거나 같은 날 시작한 기록 중 가장 최근 것 기준으로 계산
+    const ref = sorted.find(p => p.start <= ds);
+    if (!ref) return null;
+    const diff = daysBetween(ref.start, ds);
     const day = (diff % avgCycle) + 1;
     return day <= 5 ? PHASES[0] : day <= 13 ? PHASES[1] : day <= 16 ? PHASES[2] : PHASES[3];
   }
@@ -615,13 +617,12 @@ function CalView({ periods, stats, setPeriods }) {
   }
   function isInPeriod(ds) { return !!getPeriodForDay(ds); }
 
-  // 날짜 탭 핸들러
-  // ±7일 이내 인근 기록 찾기
+  // 종료일 기준 7일 이내인 기록 찾기 (종료일 수정용)
   function findNearbyPeriod(ds) {
     return periods.find(p => {
-      const distStart = Math.abs(daysBetween(p.start, ds));
-      const distEnd   = p.end ? Math.abs(daysBetween(p.end, ds)) : Infinity;
-      return distStart <= 7 || distEnd <= 7;
+      const endDate = p.end || shiftDays(p.start, 4);
+      const distEnd = Math.abs(daysBetween(endDate, ds));
+      return distEnd <= 7 && ds > p.start; // 시작일 이후이고 종료일 근처
     });
   }
 
@@ -809,25 +810,16 @@ function CalView({ periods, stats, setPeriods }) {
             {modal.mode === "edit" && modal.period && (
               <div style={{ display:"grid", gap:10 }}>
                 <div style={{ padding:"12px 14px", background:"#FFF8E8", borderRadius:12, fontSize:12, color:"#8A5E1A", lineHeight:1.6 }}>
-                  <strong>±7일 이내 기록이 있어요</strong><br/>
-                  {fmtKo(modal.period.start)}{modal.period.end ? ` ~ ${fmtKo(modal.period.end)}` : " (종료일 없음)"}
+                  <strong>종료일 근처 기록이 있어요</strong><br/>
+                  {fmtKo(modal.period.start)}{modal.period.end ? ` ~ ${fmtKo(modal.period.end)}` : " (종료일 미입력)"}
                 </div>
-                <button onClick={() => editStart(modal.period.id, modal.ds)} style={{
+                <button onClick={() => editEnd(modal.period.id, modal.ds)} style={{
                   padding:"14px", background:PHASES[0].soft,
                   border:`1.5px solid ${PHASES[0].border}`, borderRadius:14,
                   fontSize:14, fontWeight:700, color:PHASES[0].text, cursor:"pointer",
                 }}>
-                  🩸 시작일을 {fmtKo(modal.ds)}로 수정
+                  ✓ 종료일을 {fmtKo(modal.ds)}로 수정
                 </button>
-                {modal.period.end !== undefined && (
-                  <button onClick={() => editEnd(modal.period.id, modal.ds)} style={{
-                    padding:"14px", background:C.card,
-                    border:`1.5px solid ${C.border}`, borderRadius:14,
-                    fontSize:14, fontWeight:600, color:C.text, cursor:"pointer",
-                  }}>
-                    ✓ 종료일을 {fmtKo(modal.ds)}로 수정
-                  </button>
-                )}
                 <button onClick={() => setModal({ ...modal, mode:"action" })} style={{
                   padding:"14px", background:C.card,
                   border:`1.5px solid ${C.border}`, borderRadius:14,
