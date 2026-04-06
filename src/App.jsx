@@ -591,6 +591,10 @@ function CalView({ periods, stats, setPeriods }) {
   const daysInMonth = new Date(yr, mo + 1, 0).getDate();
   const today = todayStr();
   const avgCycle = stats?.avgCycle || 28;
+  const avgDuration = stats?.avgDuration ||
+    (periods.filter(p => p.end).length > 0
+      ? Math.round(periods.filter(p => p.end).reduce((a, p) => a + daysBetween(p.start, p.end) + 1, 0) / periods.filter(p => p.end).length)
+      : 5);
 
   const cells = [];
   for (let i = 0; i < firstDay; i++) cells.push(null);
@@ -641,9 +645,10 @@ function CalView({ periods, stats, setPeriods }) {
     }
   }
 
-  // 생리 시작일로 기록
+  // 생리 시작일로 기록 → avgDuration 기준으로 종료일 자동 설정
   function addStart(ds) {
-    setPeriods(prev => [...prev, { id: Date.now(), start: ds, end: null }]);
+    const endDate = shiftDays(ds, avgDuration - 1);
+    setPeriods(prev => [...prev, { id: Date.now(), start: ds, end: endDate }]);
     setModal(null);
   }
   // 종료일로 기록 — 가장 최근 종료일 없는 기록에 붙이기
@@ -966,11 +971,20 @@ function RecordView({ periods, setPeriods }) {
               const prev = sorted[i + 1];
               const dur = p.end ? daysBetween(p.start, p.end) + 1 : null;
               const cyc = prev ? daysBetween(prev.start, p.start) : null;
+              // 종료일 없으면 avgDuration 기준 예상값
+              const avgDur = sorted.filter(x => x.end).length > 0
+                ? Math.round(sorted.filter(x => x.end).reduce((a,x) => a + daysBetween(x.start, x.end) + 1, 0) / sorted.filter(x => x.end).length)
+                : 5;
+              const estEnd = !p.end ? shiftDays(p.start, avgDur - 1) : null;
               return (
                 <div key={p.id} style={{ display:"grid", gridTemplateColumns:"2fr 2fr 1fr 1fr 28px", alignItems:"center", padding:"10px 14px", borderBottom: i < sorted.length - 1 ? `1px solid ${C.border}` : "none", background: i === 0 ? "#FEFDF9" : "white" }}>
                   <div style={{ fontSize:12, fontWeight: i === 0 ? 700 : 400, color:C.text }}>{fmtKo(p.start)}</div>
-                  <div style={{ fontSize:12, color:C.text }}>{p.end ? fmtKo(p.end) : "-"}</div>
-                  <div style={{ fontSize:12, color:C.text }}>{dur ? `${dur}일` : "-"}</div>
+                  <div style={{ fontSize:12, color: p.end ? C.text : C.muted }}>
+                    {p.end ? fmtKo(p.end) : <span style={{ fontSize:11 }}>{fmtKo(estEnd)} <span style={{ fontSize:10, color:C.border }}>(예상)</span></span>}
+                  </div>
+                  <div style={{ fontSize:12, color: dur ? C.text : C.muted }}>
+                    {dur ? `${dur}일` : <span style={{ fontSize:11 }}>{avgDur}일 <span style={{ fontSize:10, color:C.border }}>(예상)</span></span>}
+                  </div>
                   <div style={{ fontSize:12, color: cyc ? C.text : C.muted }}>{cyc ? `${cyc}일` : "-"}</div>
                   <button onClick={() => setPeriods(prev => prev.filter(x => x.id !== p.id))} style={{ background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:6, color:"#EF4444", padding:"3px 5px", fontSize:11, lineHeight:1 }}>✕</button>
                 </div>
