@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>개인정보처리방침 — Me:ll</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background: #FAF8F4;
+      color: #2C2420;
+      line-height: 1.8;
+      padding: 0 0 60px;
+    }
+    header {
+      background: white;
+      border-bottom: 1px solid #E8E3DC;
+      padding: 32px 24px 24px;
+    }
+    .app-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #5A9E78;
+      background: #E4F3EB;
+      padding: 3px 10px;
+      border-radius: 100px;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+    h1 { font-size: 24px; font-weight: 700; color: #2C2420; margin-bottom: 6px; }
+    .meta { font-size: 12px; color: #8A847C; }
+    .container { max-width: 680px; margin: 0 auto; padding: 0 24px; }
+    .summary-box {
+      background: white;
+      border: 1px solid #E8E3DC;
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin: 24px 0 32px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+    }
+    .summary-box h2 { font-size: 14px; font-weight: 700; color: #2C2420; margin-bottom: 14px; }
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .summary-item { display: flex; align-items: flex-start; gap: 8px; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+    .dot.green  { background: #5A9E78; }
+    .dot.blue   { background: #7B7FC4; }
+    .dot.orange { background: #C8913A; }
+    .summary-item p { font-size: 12.5px; color: #2C2420; line-height: 1.5; }
+    section { margin-bottom: 32px; }
+    h2.section-title {
+      font-size: 16px; font-weight: 700; color: #2C2420;
+      margin-bottom: 14px; padding-bottom: 8px;
+      border-bottom: 1.5px solid #E8E3DC;
+    }
+    .card {
+      background: white; border: 1px solid #E8E3DC;
+      border-radius: 14px; padding: 16px 18px;
+      margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .card h3 { font-size: 13.5px; font-weight: 700; color: #2C2420; margin-bottom: 8px; }
+    .card p, .card li { font-size: 13px; color: #5A5450; line-height: 1.75; }
+    .card ul { padding-left: 18px; }
+    .card ul li { margin-bottom: 3px; }
+    .highlight {
+      background: #F0F4FF; border: 1px solid #C5CEF0;
+      border-radius: 10px; padding: 12px 14px; margin-top: 10px;
+      font-size: 12.5px; color: #4A5DB5; line-height: 1.65;
+    }
+    .warning {
+      background: #FFF8E8; border: 1px solid #EDD4A3;
+      border-radius: 10px; padding: 12px 14px; margin-top: 10px;
+      font-size: 12.5px; color: #8A5E1A; line-height: 1.65;
+    }
+    .warning a { color: #8A5E1A; }
+    .no-collect {
+      background: #E4F3EB; border: 1px solid #B8DEC9;
+      border-radius: 10px; padding: 12px 14px;
+      font-size: 12.5px; color: #2E6B4A; line-height: 1.65;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 4px; }
+    th {
+      text-align: left; padding: 8px 10px; background: #F7F5F0;
+      color: #8A847C; font-weight: 700; font-size: 11px; letter-spacing: 0.05em;
+    }
+    td { padding: 9px 10px; border-top: 1px solid #F0EDE8; color: #5A5450; vertical-align: top; }
+    .contact-box { background: #F7F5F0; border-radius: 14px; padding: 18px 20px; margin-top: 8px; }
+    .contact-box p { font-size: 13px; color: #5A5450; line-height: 1.8; }
+    .contact-box strong { color: #2C2420; }
+    footer {
+      text-align: center; padding: 32px 24px;
+      border-top: 1px solid #E8E3DC;
+      font-size: 11px; color: #B0AA9E; line-height: 1.8;
+    }
+    @media (max-width: 480px) {
+      .summary-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="app-badge">Me:ll</div>
+    <h1>개인정보처리방침</h1>
+    <p class="meta">시행일: 2026년 1월 1일 &nbsp;·&nbsp; 최종 수정: 2026년 1월 1일</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="summary-box">
+    <h2>한눈에 보는 요약</h2>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <span class="dot green"></span>
+        <p><strong>수집 데이터</strong><br/>생리 시작일·종료일 (기기 내 저장)</p>
+      </div>
+      <div class="summary-item">
+        <span class="dot green"></span>
+        <p><strong>서버 전송</strong><br/>없음 — 기기에만 저장</p>
+      </div>
+      <div class="summary-item">
+        <span class="dot blue"></span>
+        <p><strong>광고 서비스</strong><br/>Google AdMob (광고 식별자 사용)</p>
+      </div>
+      <div class="summary-item">
+        <span class="dot green"></span>
+        <p><strong>제3자 판매</strong><br/>없음</p>
+      </div>
+      <div class="summary-item">
+        <span class="dot orange"></span>
+        <p><strong>보유 기간</strong><br/>앱 삭제 시 자동 소멸</p>
+      </div>
+      <div class="summary-item">
+        <span class="dot green"></span>
+        <p><strong>만 14세 미만</strong><br/>서비스 대상 아님</p>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <h2 class="section-title">1. 수집하는 개인정보 항목</h2>
+    <div class="card">
+      <h3>앱이 직접 수집하는 정보</h3>
+      <table>
+        <tr><th>항목</th><th>수집 목적</th><th>저장 위치</th></tr>
+        <tr>
+          <td>생리 시작일·종료일</td>
+          <td>사이클 분석, 다음 생리 예측, 가임기 계산</td>
+          <td>기기 내 로컬 스토리지</td>
+        </tr>
+        <tr>
+          <td>알림 설정 정보</td>
+          <td>맞춤 알림 발송</td>
+          <td>기기 내 로컬 스토리지</td>
+        </tr>
+      </table>
+      <div class="no-collect" style="margin-top:12px">
+        ✓ 위 정보는 기기 밖으로 전송되지 않으며, 운영자 서버에 저장되지 않습니다.<br/>
+        ✓ 이름, 이메일, 전화번호, 위치 정보 등 식별 정보는 수집하지 않습니다.
+      </div>
+    </div>
+    <div class="card">
+      <h3>광고 서비스를 통해 자동 수집되는 정보 (Google AdMob)</h3>
+      <p style="margin-bottom:8px">본 앱은 Google AdMob을 통한 광고를 표시합니다. AdMob은 광고 최적화를 위해 아래 정보를 자동 수집할 수 있습니다.</p>
+      <ul>
+        <li>광고 식별자 (IDFA / GAID)</li>
+        <li>IP 주소 (국가·언어 설정 파악용)</li>
+        <li>기기 모델, 운영체제 버전</li>
+        <li>앱 사용 패턴 (광고 노출·클릭 여부)</li>
+      </ul>
+      <div class="warning">
+        AdMob의 개인정보 처리에 대한 자세한 내용은 Google의 개인정보처리방침을 확인하세요.<br/>
+        <a href="https://policies.google.com/privacy">https://policies.google.com/privacy</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">2. 수집하지 않는 정보</h2>
+    <div class="card">
+      <p>본 앱은 다음 정보를 수집하지 않습니다.</p>
+      <ul style="margin-top:10px">
+        <li>이름, 이메일, 전화번호 등 식별 가능한 개인정보</li>
+        <li>위치 정보 (GPS)</li>
+        <li>연락처, 사진, 카메라 접근 권한</li>
+        <li>Apple Health / Google Fit 데이터</li>
+        <li>소셜 미디어 계정 정보</li>
+        <li>결제 정보</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">3. 개인정보 이용 목적</h2>
+    <div class="card">
+      <table>
+        <tr><th>목적</th><th>상세 내용</th></tr>
+        <tr>
+          <td>사이클 분석 및 예측</td>
+          <td>생리 시작일 기반으로 평균 주기 계산, 다음 생리일·가임기·배란일 예측</td>
+        </tr>
+        <tr>
+          <td>맞춤 정보 제공</td>
+          <td>현재 시기에 맞는 음식·운동·건강 정보 표시</td>
+        </tr>
+        <tr>
+          <td>알림 발송</td>
+          <td>사용자가 설정한 항목에 따라 로컬 알림 발송 (서버 불필요)</td>
+        </tr>
+        <tr>
+          <td>광고 표시</td>
+          <td>앱 운영 비용 충당을 위한 AdMob 광고 표시</td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">4. 정보 저장 및 보안</h2>
+    <div class="card">
+      <h3>저장 방식</h3>
+      <p>수집된 모든 데이터는 사용자의 기기 내 로컬 스토리지에만 저장됩니다. 인터넷 연결이나 외부 서버 전송 없이 기기 내에서만 처리됩니다.</p>
+      <div class="highlight" style="margin-top:12px">
+        📱 앱을 삭제하면 저장된 모든 데이터가 영구적으로 삭제됩니다.<br/>
+        📱 기기를 교체하면 데이터가 이전되지 않습니다. (별도 백업 기능 미제공)
+      </div>
+    </div>
+    <div class="card">
+      <h3>보유 기간</h3>
+      <p>기기에 앱이 설치되어 있는 동안 데이터가 유지되며, 앱 삭제 시 즉시 소멸됩니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">5. 제3자 제공 및 위탁</h2>
+    <div class="card">
+      <div class="no-collect">
+        본 앱은 사용자의 개인정보를 제3자에게 판매, 임대, 또는 제공하지 않습니다.
+      </div>
+      <p style="margin-top:12px">단, 광고 서비스 운영을 위해 Google AdMob이 기기 식별자 및 광고 관련 데이터를 처리할 수 있습니다. 이는 Google의 자체 개인정보처리방침에 따라 처리됩니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">6. 사용자의 권리</h2>
+    <div class="card">
+      <h3>데이터 삭제</h3>
+      <p>앱 내 <strong>기록 관리</strong> 탭에서 개별 기록을 삭제할 수 있으며, 앱을 삭제하면 모든 데이터가 완전히 제거됩니다.</p>
+    </div>
+    <div class="card">
+      <h3>광고 추적 거부 (iOS)</h3>
+      <p>iOS 14 이상에서는 앱 첫 실행 시 앱 추적 투명성(ATT) 동의 여부를 선택할 수 있습니다. 추적을 거부해도 앱의 핵심 기능은 정상적으로 사용 가능합니다.</p>
+    </div>
+    <div class="card">
+      <h3>알림 거부</h3>
+      <p>기기 설정 앱 → 알림 → Me:ll에서 알림을 언제든지 끌 수 있습니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">7. 아동 개인정보 보호</h2>
+    <div class="card">
+      <p>본 앱은 <strong>만 14세 이상</strong>을 대상으로 제공됩니다. 만 14세 미만 아동의 개인정보를 의도적으로 수집하지 않으며, 해당 사실이 확인될 경우 관련 데이터를 즉시 삭제합니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">8. 건강 정보 면책 고지</h2>
+    <div class="card">
+      <p>본 앱이 제공하는 생리 예측, 가임기 추정, 임신 확률 등 모든 건강 관련 정보는 <strong>통계적 참고 자료</strong>이며, 의학적 진단이나 처방을 대체하지 않습니다. 건강 관련 결정은 반드시 전문 의료인과 상담하시기 바랍니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">9. 개인정보처리방침 변경</h2>
+    <div class="card">
+      <p>본 방침은 법령 변경 또는 서비스 변경에 따라 업데이트될 수 있습니다. 중요한 변경이 있을 경우 앱 업데이트 노트 또는 본 페이지를 통해 사전 공지합니다. 변경된 방침은 공지 후 7일 이후부터 효력이 발생합니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">10. 개인정보 관련 문의</h2>
+    <div class="contact-box">
+      <p>
+        <strong>운영자</strong>: hhappyfamilydais<br/>
+        <strong>앱 이름</strong>: Me:ll<br/>
+        <strong>문의</strong>: 앱스토어 리뷰 또는 개발자 연락처<br/>
+        <strong>처리 기간</strong>: 접수 후 7영업일 이내 회신
+      </p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>© 2026 hhappyfamilydais · All rights reserved</p>
+  <p style="margin-top:4px">본 방침은 대한민국 개인정보 보호법 및 Apple App Store 가이드라인을 준수합니다.</p>
+</footer>
+
+</body>
+</html>
