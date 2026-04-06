@@ -572,13 +572,233 @@ function DdayRow({ stats }) {
 }
 
 // ── Calendar view ──
-function CalView({ periods, stats }) {
+function CalView({ periods, stats, setPeriods }) {
   const [calMonth, setCalMonth] = useState(new Date());
+  const [modal, setModal]       = useState(null); // { ds, mode } mode: 'start'|'end'|'menu'
   const yr = calMonth.getFullYear(), mo = calMonth.getMonth();
   const firstDay = new Date(yr, mo, 1).getDay();
   const daysInMonth = new Date(yr, mo + 1, 0).getDate();
   const today = todayStr();
   const avgCycle = stats?.avgCycle || 28;
+
+  const cells = [];
+  for (let i = 0; i < firstDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ms = String(mo + 1).padStart(2, "0"), ds = String(d).padStart(2, "0");
+    cells.push(`${yr}-${ms}-${ds}`);
+  }
+
+  function getDayPhase(ds) {
+    if (!periods.length) return null;
+    const sorted = [...periods].sort((a, b) => toDate(b.start) - toDate(a.start));
+    const diff = daysBetween(sorted[0].start, ds);
+    if (diff < 0) return null;
+    const day = (diff % avgCycle) + 1;
+    return day <= 5 ? PHASES[0] : day <= 13 ? PHASES[1] : day <= 16 ? PHASES[2] : PHASES[3];
+  }
+  function getPeriodForDay(ds) {
+    return periods.find(p => {
+      const end = p.end || shiftDays(p.start, 4);
+      return ds >= p.start && ds <= end;
+    });
+  }
+  function isInPeriod(ds) { return !!getPeriodForDay(ds); }
+
+  // 날짜 탭 핸들러
+  function handleDayTap(ds) {
+    const period = getPeriodForDay(ds);
+    if (period) {
+      // 이미 기록된 날 → 삭제 메뉴
+      setModal({ ds, mode: "menu", period });
+    } else {
+      // 기록 없는 날 → 시작/종료 선택
+      setModal({ ds, mode: "action" });
+    }
+  }
+
+  // 생리 시작일로 기록
+  function addStart(ds) {
+    setPeriods(prev => [...prev, { id: Date.now(), start: ds, end: null }]);
+    setModal(null);
+  }
+  // 종료일로 기록 — 가장 최근 종료일 없는 기록에 붙이기
+  function addEnd(ds) {
+    setPeriods(prev => {
+      const open = [...prev].sort((a,b) => toDate(b.start)-toDate(a.start))
+        .find(p => !p.end && p.start <= ds);
+      if (!open) return [...prev, { id: Date.now(), start: ds, end: null }];
+      return prev.map(p => p.id === open.id ? { ...p, end: ds } : p);
+    });
+    setModal(null);
+  }
+  // 기록 삭제
+  function deletePeriod(id) {
+    setPeriods(prev => prev.filter(p => p.id !== id));
+    setModal(null);
+  }
+
+  return (
+    <div>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+        <button onClick={() => setCalMonth(new Date(yr, mo - 1, 1))} style={{ background:"none", border:"none", fontSize:20, color:C.muted, padding:"4px 12px" }}>‹</button>
+        <div style={{ fontSize:15, fontWeight:700, color:C.text }}>{yr}년 {mo+1}월</div>
+        <button onClick={() => setCalMonth(new Date(yr, mo + 1, 1))} style={{ background:"none", border:"none", fontSize:20, color:C.muted, padding:"4px 12px" }}>›</button>
+      </div>
+
+      {/* 안내 문구 */}
+      <div style={{ fontSize:11, color:C.muted, marginBottom:12, textAlign:"center", background:PHASES[0].soft, borderRadius:10, padding:"7px 12px", border:`1px solid ${PHASES[0].border}` }}>
+        날짜를 탭하면 생리 기록을 추가할 수 있어요
+      </div>
+
+      {/* Legend */}
+      <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginBottom:14 }}>
+        {PHASES.map(p => (
+          <div key={p.id} style={{ display:"flex", alignItems:"center", gap:4 }}>
+            <div style={{ width:12, height:12, borderRadius:3, background:p.soft, border:`1.5px solid ${p.color}` }} />
+            <span style={{ fontSize:10, color:C.muted }}>{p.name}</span>
+          </div>
+        ))}
+        <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+          <div style={{ width:12, height:12, borderRadius:3, background:"transparent",
+            border:`1.5px dashed ${PHASES[2].color}`,
+            position:"relative", display:"flex", alignItems:"center", justifyContent:"center" }}>
+            <div style={{ width:4, height:4, borderRadius:"50%", background:PHASES[2].color }} />
+          </div>
+          <span style={{ fontSize:10, color:C.muted }}>가임기</span>
+        </div>
+      </div>
+
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", marginBottom:4 }}>
+        {["일","월","화","수","목","금","토"].map(d => (
+          <div key={d} style={{ textAlign:"center", fontSize:10, fontWeight:700, color:C.muted, padding:"4px 0" }}>{d}</div>
+        ))}
+      </div>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:3 }}>
+        {cells.map((ds, i) => {
+          if (!ds) return <div key={i} />;
+          const isToday = ds === today;
+          const inPeriod = isInPeriod(ds);
+          const ph = getDayPhase(ds);
+          const inFertile = stats && ds >= stats.fertileStart && ds <= stats.fertileEnd;
+          const isOvulation = stats && ds === stats.ovulation;
+
+          let bg, borderStyle, col, extra = null;
+          if (inPeriod) {
+            bg = PHASES[0].soft; borderStyle = `1.5px solid ${PHASES[0].border}`; col = PHASES[0].text;
+          } else if (isOvulation) {
+            bg = PHASES[2].soft; borderStyle = `2px solid ${PHASES[2].color}`; col = PHASES[2].text;
+            extra = <div style={{ position:"absolute", top:2, right:3, fontSize:8, color:PHASES[2].color, fontWeight:700 }}>●</div>;
+          } else if (inFertile) {
+            bg = "transparent"; borderStyle = `1.5px dashed ${PHASES[2].color}`; col = PHASES[2].text;
+            extra = <div style={{ width:3.5, height:3.5, borderRadius:"50%", background:PHASES[2].color, position:"absolute", bottom:2 }} />;
+          } else if (ph) {
+            bg = ph.soft; borderStyle = `1px solid transparent`; col = ph.text;
+          } else {
+            bg = "transparent"; borderStyle = "1px solid transparent"; col = C.text;
+          }
+          if (isToday) borderStyle = `2px solid ${C.text}`;
+
+          return (
+            <div key={i}
+              onClick={() => handleDayTap(ds)}
+              style={{ aspectRatio:"1", display:"flex", alignItems:"center", justifyContent:"center",
+                flexDirection:"column", borderRadius:7, background:bg, border:borderStyle,
+                position:"relative", cursor:"pointer", WebkitTapHighlightColor:"transparent" }}>
+              <span style={{ fontSize:11, fontWeight:isToday ? 700 : 400, color:col }}>
+                {parseInt(ds.split("-")[2])}
+              </span>
+              {extra}
+            </div>
+          );
+        })}
+      </div>
+
+      {stats && (
+        <div style={{ marginTop:14, background:C.card, border:`1px solid ${C.border}`, borderRadius:14, padding:"13px 15px", fontSize:12, color:C.muted, lineHeight:1.9 }}>
+          <div style={{ fontWeight:700, color:C.text, marginBottom:5, fontSize:13 }}>이번 달 예측</div>
+          <div>다음 생리 예상 <strong style={{ color:C.text }}>{fmtKo(stats.nextPeriod)}</strong></div>
+          <div>가임기 <strong style={{ color:PHASES[2].text }}>{fmtKo(stats.fertileStart)} ~ {fmtKo(stats.fertileEnd)}</strong></div>
+          <div>배란 예상 <strong style={{ color:PHASES[2].text }}>{fmtKo(stats.ovulation)}</strong></div>
+        </div>
+      )}
+
+      {/* ── 날짜 탭 모달 ── */}
+      {modal && (
+        <div onClick={() => setModal(null)} style={{
+          position:"fixed", inset:0, background:"rgba(0,0,0,0.35)",
+          display:"flex", alignItems:"flex-end", zIndex:100,
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            width:"100%", background:"white", borderRadius:"20px 20px 0 0",
+            padding:"20px 20px 36px", boxShadow:"0 -4px 24px rgba(0,0,0,0.12)",
+          }}>
+            {/* 날짜 표시 */}
+            <div style={{ textAlign:"center", marginBottom:16 }}>
+              <div style={{ fontSize:13, fontWeight:700, color:C.text }}>
+                {fmtKo(modal.ds)} {modal.ds === today ? "· 오늘" : ""}
+              </div>
+            </div>
+
+            {modal.mode === "action" && (
+              <div style={{ display:"grid", gap:10 }}>
+                <button onClick={() => addStart(modal.ds)} style={{
+                  padding:"15px", background:PHASES[0].soft,
+                  border:`1.5px solid ${PHASES[0].border}`, borderRadius:14,
+                  fontSize:14, fontWeight:700, color:PHASES[0].text, cursor:"pointer",
+                }}>
+                  🩸 생리 시작일로 기록
+                </button>
+                <button onClick={() => addEnd(modal.ds)} style={{
+                  padding:"15px", background:C.card,
+                  border:`1.5px solid ${C.border}`, borderRadius:14,
+                  fontSize:14, fontWeight:600, color:C.text, cursor:"pointer",
+                }}>
+                  ✓ 생리 종료일로 기록
+                </button>
+                <button onClick={() => setModal(null)} style={{
+                  padding:"12px", background:"transparent", border:"none",
+                  fontSize:13, color:C.muted, cursor:"pointer",
+                }}>
+                  취소
+                </button>
+              </div>
+            )}
+
+            {modal.mode === "menu" && modal.period && (
+              <div style={{ display:"grid", gap:10 }}>
+                <div style={{ padding:"12px 14px", background:PHASES[0].soft, borderRadius:12, fontSize:12, color:PHASES[0].text }}>
+                  기록된 생리: {fmtKo(modal.period.start)}{modal.period.end ? ` ~ ${fmtKo(modal.period.end)}` : " (종료일 없음)"}
+                </div>
+                {!modal.period.end && (
+                  <button onClick={() => addEnd(modal.ds)} style={{
+                    padding:"14px", background:C.card,
+                    border:`1.5px solid ${C.border}`, borderRadius:14,
+                    fontSize:14, fontWeight:600, color:C.text, cursor:"pointer",
+                  }}>
+                    ✓ 이 날을 종료일로 기록
+                  </button>
+                )}
+                <button onClick={() => deletePeriod(modal.period.id)} style={{
+                  padding:"14px", background:"#FEF2F2",
+                  border:"1.5px solid #FECACA", borderRadius:14,
+                  fontSize:14, fontWeight:600, color:"#EF4444", cursor:"pointer",
+                }}>
+                  🗑 이 기록 삭제
+                </button>
+                <button onClick={() => setModal(null)} style={{
+                  padding:"12px", background:"transparent", border:"none",
+                  fontSize:13, color:C.muted, cursor:"pointer",
+                }}>
+                  취소
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
   const cells = [];
   for (let i = 0; i < firstDay; i++) cells.push(null);
@@ -1621,7 +1841,7 @@ export default function App() {
           )
         )}
 
-        {tab === "cal" && <CalView periods={periods} stats={stats} />}
+        {tab === "cal" && <CalView periods={periods} stats={stats} setPeriods={setPeriods} />}
         {tab === "record" && <RecordView periods={periods} setPeriods={setPeriods} />}
         {tab === "my" && <MyPage stats={stats} periods={periods} user={user} />}
 
