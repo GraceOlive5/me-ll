@@ -1,4 +1,20 @@
 import { useState, useEffect } from "react";
+import { initializeApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+
+// ── Firebase 설정 ──
+const firebaseConfig = {
+  apiKey: "AIzaSyAD36kEdHqfs7rpzZPKPMD0so2SZ1Ys1k4",
+  authDomain: "me-ll-b517c.firebaseapp.com",
+  projectId: "me-ll-b517c",
+  storageBucket: "me-ll-b517c.firebasestorage.app",
+  messagingSenderId: "1049600796280",
+  appId: "1:1049600796280:web:dfa735423e53197d16af8d"
+};
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db   = getFirestore(firebaseApp);
 
 const PHASES = [
   {
@@ -490,6 +506,10 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay, totalDays }) 
             fontSize="9" fill={C.muted} fontFamily="DM Sans,sans-serif">
             / {totalDays}일
           </text>
+          <text x={cx} y={cy + 47} textAnchor="middle"
+            fontSize="9" fill={C.muted} fontFamily="DM Sans,sans-serif" opacity="0.75">
+            {new Date().toLocaleDateString("ko-KR", { month:"numeric", day:"numeric", weekday:"short" })}
+          </text>
         </>
       ) : null}
     </svg>
@@ -871,6 +891,78 @@ function AdBanner({ type = "banner" }) {
   );
 }
 
+// ── Login Screen ──
+function LoginScreen({ onLogin }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError]   = useState(null);
+
+  async function handleGoogle() {
+    setLoading(true); setError(null);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (e) {
+      setError("로그인에 실패했어요. 다시 시도해주세요.");
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div style={{ minHeight:"100vh", background:C.bg, fontFamily:"DM Sans,sans-serif",
+      display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+      padding:"32px 28px" }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap');*{box-sizing:border-box;margin:0;padding:0}`}</style>
+
+      {/* Logo */}
+      <div style={{ textAlign:"center", marginBottom:48 }}>
+        <div style={{ fontSize:11, color:C.muted, letterSpacing:"0.16em", textTransform:"uppercase", fontWeight:600, marginBottom:8 }}>
+          나에게로 돌아오는 시간
+        </div>
+        <div style={{ fontSize:42, fontFamily:"DM Serif Display,serif", color:C.text, lineHeight:1 }}>Me:ll</div>
+        <div style={{ width:32, height:2, background:PHASES[1].color, borderRadius:2, margin:"16px auto 0" }}/>
+      </div>
+
+      {/* Description */}
+      <div style={{ textAlign:"center", marginBottom:40, maxWidth:280 }}>
+        <p style={{ fontSize:14, color:C.muted, lineHeight:1.8 }}>
+          나의 사이클 데이터를 안전하게 보관하고<br/>
+          어느 기기에서든 이어서 사용할 수 있어요.
+        </p>
+      </div>
+
+      {/* Google Login */}
+      <button onClick={handleGoogle} disabled={loading} style={{
+        width:"100%", maxWidth:320, padding:"15px 20px",
+        background:"white", border:`1.5px solid ${C.border}`,
+        borderRadius:14, cursor:loading ? "default" : "pointer",
+        display:"flex", alignItems:"center", justifyContent:"center", gap:12,
+        boxShadow:"0 2px 12px rgba(0,0,0,0.07)", transition:"all 0.2s",
+        opacity: loading ? 0.7 : 1,
+      }}>
+        {/* Google icon */}
+        <svg width="20" height="20" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        <span style={{ fontSize:15, fontWeight:600, color:C.text }}>
+          {loading ? "로그인 중..." : "Google로 시작하기"}
+        </span>
+      </button>
+
+      {error && (
+        <p style={{ marginTop:14, fontSize:12, color:"#EF4444", textAlign:"center" }}>{error}</p>
+      )}
+
+      <p style={{ marginTop:28, fontSize:11, color:C.muted, textAlign:"center", lineHeight:1.7, maxWidth:280 }}>
+        로그인하면 생리 기록이 안전하게 클라우드에 저장돼요.<br/>
+        이름·이메일 외 개인정보는 수집하지 않아요.
+      </p>
+    </div>
+  );
+}
+
 // ── Toggle Switch ──
 function Toggle({ on, onChange }) {
   return (
@@ -940,7 +1032,7 @@ async function requestAndNotify(title, body) {
 }
 
 // ── My page ──
-function MyPage({ stats, periods }) {
+function MyPage({ stats, periods, user }) {
   const [prefs, setPrefs] = useState(loadNotifPrefs);
   const [notifPerm, setNotifPerm] = useState(
     typeof Notification !== "undefined" ? Notification.permission : "unsupported"
@@ -965,6 +1057,26 @@ function MyPage({ stats, periods }) {
 
   return (
     <div>
+
+      {/* 계정 정보 */}
+      {user && (
+        <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:16, padding:"14px 16px", marginBottom:20, display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow:"0 1px 5px rgba(0,0,0,0.04)" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            {user.photoURL && (
+              <img src={user.photoURL} alt="" style={{ width:38, height:38, borderRadius:"50%", border:`1.5px solid ${C.border}` }}/>
+            )}
+            <div>
+              <div style={{ fontSize:13, fontWeight:700, color:C.text }}>{user.displayName || "사용자"}</div>
+              <div style={{ fontSize:11, color:C.muted }}>{user.email}</div>
+            </div>
+          </div>
+          <button onClick={() => signOut(auth)} style={{
+            padding:"7px 14px", background:"transparent",
+            border:`1px solid ${C.border}`, borderRadius:100,
+            fontSize:12, color:C.muted, cursor:"pointer",
+          }}>로그아웃</button>
+        </div>
+      )}
 
       {/* Stats */}
       <div style={{ fontSize:14, fontWeight:700, marginBottom:12, color:C.text }}>나의 통계</div>
@@ -1126,40 +1238,49 @@ function MyPage({ stats, periods }) {
   );
 }
 export default function App() {
+  const [user, setUser]       = useState(undefined); // undefined=loading, null=로그아웃
   const [periods, setPeriods] = useState([]);
-  const [loaded, setLoaded] = useState(false);
-  const [tab, setTab] = useState("dash");
-  const [sec, setSec] = useState("tips");
-  const [selId, setSelId] = useState(null);
-  const [ready, setReady] = useState(false);
+  const [loaded, setLoaded]   = useState(false);
+  const [tab, setTab]         = useState("dash");
+  const [sec, setSec]         = useState("tips");
+  const [selId, setSelId]     = useState(null);
+  const [ready, setReady]     = useState(false);
 
-  // Embed mode: ?embed=true → 대시보드만 표시, 클릭하면 앱 열기
+  // Embed mode
   const isEmbed = typeof window !== "undefined" &&
     new URLSearchParams(window.location.search).get("embed") === "true";
   const APP_URL = typeof window !== "undefined"
     ? window.location.href.replace(/[?#].*$/, "")
     : "";
 
+  // ── Auth 상태 감지 ──
   useEffect(() => {
+    const unsub = onAuthStateChanged(auth, u => setUser(u ?? null));
+    return unsub;
+  }, []);
+
+  // ── 로그인 후 Firestore에서 데이터 불러오기 ──
+  useEffect(() => {
+    if (!user) { setLoaded(false); setPeriods([]); return; }
     (async () => {
       try {
-        const raw = localStorage.getItem("cycle-v4");
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) setPeriods(parsed);
+        const snap = await getDoc(doc(db, "users", user.uid));
+        if (snap.exists()) {
+          const data = snap.data().periods;
+          if (Array.isArray(data)) setPeriods(data);
         }
-      } catch (e) {}
+      } catch (e) { console.error(e); }
       setLoaded(true);
       setTimeout(() => setReady(true), 400);
     })();
-  }, []);
+  }, [user]);
 
+  // ── 데이터 변경 시 Firestore에 저장 ──
   useEffect(() => {
-    if (!loaded) return;
-    (async () => {
-      try { localStorage.setItem("cycle-v4", JSON.stringify(periods)); } catch (e) {}
-    })();
-  }, [periods, loaded]);
+    if (!user || !loaded) return;
+    setDoc(doc(db, "users", user.uid), { periods }, { merge: true })
+      .catch(e => console.error(e));
+  }, [periods, loaded, user]);
 
   const stats = computeStats(periods);
   const isToday = selId === null;
@@ -1178,6 +1299,18 @@ export default function App() {
   };
 
   const todayFmt = new Date().toLocaleDateString("ko-KR", { year:"numeric", month:"long", day:"numeric", weekday:"long" });
+
+  // ── 인증 로딩 중 ──
+  if (user === undefined) {
+    return (
+      <div style={{ minHeight:"100vh", background:C.bg, display:"flex", alignItems:"center", justifyContent:"center" }}>
+        <div style={{ fontSize:13, color:C.muted }}>불러오는 중...</div>
+      </div>
+    );
+  }
+
+  // ── 로그인 필요 (임베드 모드 제외) ──
+  if (!user && !isEmbed) return <LoginScreen />;
 
   // ── EMBED MODE ──────────────────────────────────────────────
   if (isEmbed) {
@@ -1276,10 +1409,9 @@ export default function App() {
       `}</style>
 
       {/* Header */}
-      <div style={{ padding:"22px 20px 13px", borderBottom:`1px solid ${C.border}`, background:"white", position:"sticky", top:0, zIndex:10 }}>
-        <div style={{ fontSize:10, color:C.muted, letterSpacing:"0.14em", textTransform:"uppercase", marginBottom:3, fontWeight:600 }}>나에게로 돌아오는 시간</div>
-        <div style={{ fontSize:22, fontFamily:"DM Serif Display,serif", color:C.text }}>Me:ll</div>
-        <div style={{ fontSize:11, color:C.muted, marginTop:4 }}>{todayFmt}</div>
+      <div style={{ padding:"16px 20px 13px", borderBottom:`1px solid ${C.border}`, background:"white", position:"sticky", top:0, zIndex:10, textAlign:"center" }}>
+        <div style={{ fontSize:9.5, color:C.muted, letterSpacing:"0.14em", textTransform:"uppercase", fontWeight:600, marginBottom:2 }}>나에게로 돌아오는 시간</div>
+        <div style={{ fontSize:22, fontFamily:"DM Serif Display,serif", color:C.text, lineHeight:1.2 }}>Me:ll</div>
       </div>
 
       <div style={{ padding:"16px 18px 0", maxWidth:460, margin:"0 auto" }}>
@@ -1491,7 +1623,7 @@ export default function App() {
 
         {tab === "cal" && <CalView periods={periods} stats={stats} />}
         {tab === "record" && <RecordView periods={periods} setPeriods={setPeriods} />}
-        {tab === "my" && <MyPage stats={stats} periods={periods} />}
+        {tab === "my" && <MyPage stats={stats} periods={periods} user={user} />}
 
       </div>
 
