@@ -843,6 +843,8 @@ function CalView({ periods, stats, setPeriods }) {
                 </button>
               </div>
             )}
+
+            {modal.mode === "menu" && modal.period && (
               <div style={{ display:"grid", gap:10 }}>
                 <div style={{ padding:"12px 14px", background:PHASES[0].soft, borderRadius:12, fontSize:12, color:PHASES[0].text }}>
                   기록된 생리: {fmtKo(modal.period.start)}{modal.period.end ? ` ~ ${fmtKo(modal.period.end)}` : " (종료일 없음)"}
