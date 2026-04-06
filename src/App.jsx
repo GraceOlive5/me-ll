@@ -1793,7 +1793,7 @@ export default function App() {
                 <AdBanner type="rectangle"/>
               </div>
 
-              {/* ── Festival Card ── */}
+              {/* ── Festival Card (TODO: 데이터 업데이트 후 활성화) ──
               <div style={{ marginTop:20, marginBottom:8 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
                   <div style={{ fontSize:10, color:C.muted, letterSpacing:"0.1em", textTransform:"uppercase", fontWeight:600 }}>
@@ -1804,7 +1804,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Wellness festivals */}
                 <div style={{ background:seasonInfo.soft, border:`1px solid ${seasonInfo.border}`, borderRadius:16, padding:"16px 18px", marginBottom:10 }}>
                   <div style={{ fontSize:12, fontWeight:700, color:seasonInfo.color, marginBottom:10 }}>
                     웰니스 & 운동 이벤트
@@ -1819,7 +1818,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Mood-up festivals */}
                 <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:16, padding:"16px 18px", boxShadow:"0 1px 6px rgba(0,0,0,0.04)" }}>
                   <div style={{ fontSize:12, fontWeight:700, color:C.text, marginBottom:10 }}>
                     ✨ 무드 업 페스티벌
@@ -1834,6 +1832,7 @@ export default function App() {
                   </div>
                 </div>
               </div>
+              ── Festival Card 끝 ── */}
             </>
           )
         )}
