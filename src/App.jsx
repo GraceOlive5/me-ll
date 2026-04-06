@@ -274,57 +274,68 @@ function fmtKo(str) { const d = toDate(str); return `${d.getMonth()+1}월 ${d.ge
 
 function computeStats(periods) {
   if (!periods || periods.length === 0) return null;
-  const sorted = [...periods].sort((a, b) => toDate(b.start) - toDate(a.start));
-  const today = todayStr();
-  const diff = daysBetween(sorted[0].start, today);
-  const daysSince = diff + 1;
-  if (daysSince < 1) return null;
+  try {
+    const sorted = [...periods]
+      .filter(p => p && p.start)
+      .sort((a, b) => toDate(b.start) - toDate(a.start));
+    if (!sorted.length) return null;
 
-  let avgCycle = 28;
-  if (sorted.length >= 2) {
-    const gaps = [];
-    for (let i = 0; i < sorted.length - 1; i++) {
-      const g = daysBetween(sorted[i + 1].start, sorted[i].start);
-      if (g >= 21 && g <= 45) gaps.push(g);
+    const today = todayStr();
+    const diff = daysBetween(sorted[0].start, today);
+    // 미래 날짜가 가장 최근 기록이면 → 그 다음 기록 기준으로
+    const recentPast = sorted.find(p => daysBetween(p.start, today) >= 0);
+    if (!recentPast) return null;
+
+    const daysSince = daysBetween(recentPast.start, today) + 1;
+
+    let avgCycle = 28;
+    if (sorted.length >= 2) {
+      const gaps = [];
+      for (let i = 0; i < sorted.length - 1; i++) {
+        const g = daysBetween(sorted[i + 1].start, sorted[i].start);
+        if (g >= 21 && g <= 45) gaps.push(g);
+      }
+      if (gaps.length) avgCycle = Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length);
     }
-    if (gaps.length) avgCycle = Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length);
+
+    const durs = sorted.filter(p => p.end).map(p => daysBetween(p.start, p.end) + 1);
+    const avgDuration = durs.length ? Math.round(durs.reduce((a, b) => a + b, 0) / durs.length) : 5;
+
+    const cycleDay = ((daysSince - 1) % avgCycle) + 1;
+    const CLOCK_OFFSET = (5 / 28) * 360;
+    const angle = (((cycleDay - 1) / avgCycle) * 360 - CLOCK_OFFSET + 360) % 360;
+    const phase = cycleDay <= 5 ? PHASES[0] : cycleDay <= 13 ? PHASES[1] : cycleDay <= 16 ? PHASES[2] : PHASES[3];
+
+    const elapsed = Math.ceil(daysSince / avgCycle);
+    const nextPeriod = shiftDays(recentPast.start, avgCycle * elapsed);
+    const dToNext = daysBetween(today, nextPeriod);
+
+    const ovulation = shiftDays(nextPeriod, -14);
+    const fertileStart = shiftDays(ovulation, -5);
+    const fertileEnd = shiftDays(ovulation, 1);
+    const dToFertile = daysBetween(today, fertileStart);
+    const inFertile = today >= fertileStart && today <= fertileEnd;
+
+    let pPct = 3, pLabel = "매우 낮음";
+    if (cycleDay >= 10 && cycleDay <= 11) { pPct = 12; pLabel = "낮음"; }
+    else if (cycleDay >= 12 && cycleDay <= 13) { pPct = 20; pLabel = "보통"; }
+    else if (cycleDay === 14) { pPct = 33; pLabel = "높음"; }
+    else if (cycleDay >= 15 && cycleDay <= 17) { pPct = 25; pLabel = "높음"; }
+    else if (cycleDay >= 18 && cycleDay <= 21) { pPct = 10; pLabel = "낮음"; }
+
+    return {
+      cycleDay, angle, phase, avgCycle, avgDuration,
+      dIn: Math.max(1, cycleDay - phase.dayRange[0] + 1),
+      dTotal: phase.dayRange[1] - phase.dayRange[0] + 1,
+      dLeft: Math.max(0, phase.dayRange[1] - cycleDay + 1),
+      nextPeriod, dToNext,
+      fertileStart, fertileEnd, ovulation, dToFertile, inFertile,
+      pPct, pLabel,
+    };
+  } catch (e) {
+    console.error("computeStats error:", e);
+    return null;
   }
-
-  const durs = sorted.filter(p => p.end).map(p => daysBetween(p.start, p.end) + 1);
-  const avgDuration = durs.length ? Math.round(durs.reduce((a, b) => a + b, 0) / durs.length) : 5;
-
-  const cycleDay = ((daysSince - 1) % avgCycle) + 1;
-  // 난포기(Day 6)가 12시(0°)에 오도록 오프셋 적용
-  const CLOCK_OFFSET = (5 / 28) * 360; // 생리기 5일 분량만큼 역방향 이동
-  const angle = (((cycleDay - 1) / avgCycle) * 360 - CLOCK_OFFSET + 360) % 360;
-  const phase = cycleDay <= 5 ? PHASES[0] : cycleDay <= 13 ? PHASES[1] : cycleDay <= 16 ? PHASES[2] : PHASES[3];
-
-  const elapsed = Math.ceil(daysSince / avgCycle);
-  const nextPeriod = shiftDays(sorted[0].start, avgCycle * elapsed);
-  const dToNext = daysBetween(today, nextPeriod);
-
-  const ovulation = shiftDays(nextPeriod, -14);
-  const fertileStart = shiftDays(ovulation, -5);
-  const fertileEnd = shiftDays(ovulation, 1);
-  const dToFertile = daysBetween(today, fertileStart);
-  const inFertile = today >= fertileStart && today <= fertileEnd;
-
-  let pPct = 3, pLabel = "매우 낮음";
-  if (cycleDay >= 10 && cycleDay <= 11) { pPct = 12; pLabel = "낮음"; }
-  else if (cycleDay >= 12 && cycleDay <= 13) { pPct = 20; pLabel = "보통"; }
-  else if (cycleDay === 14) { pPct = 33; pLabel = "높음"; }
-  else if (cycleDay >= 15 && cycleDay <= 17) { pPct = 25; pLabel = "높음"; }
-  else if (cycleDay >= 18 && cycleDay <= 21) { pPct = 10; pLabel = "낮음"; }
-
-  return {
-    cycleDay, angle, phase, avgCycle, avgDuration,
-    dIn: Math.max(1, cycleDay - phase.dayRange[0] + 1),
-    dTotal: phase.dayRange[1] - phase.dayRange[0] + 1,
-    dLeft: Math.max(0, phase.dayRange[1] - cycleDay + 1),
-    nextPeriod, dToNext,
-    fertileStart, fertileEnd, ovulation, dToFertile, inFertile,
-    pPct, pLabel,
-  };
 }
 
 const C = { bg:"#FAF8F4", card:"white", text:"#2C2420", muted:"#8A847C", border:"#E8E3DC" };
