@@ -190,7 +190,7 @@ function StarField() {
   );
 }
 
-const C = { bg:"#07071e", card:"#0d0d2a", cardAlt:"#0a0a20", text:"#ede8f5", muted:"#7070a0", border:"#1e1e42" };
+const C = { bg:"#07071e", card:"#0d0d2a", cardAlt:"#0a0a22", text:"#ede8f5", muted:"#9898c0", border:"#252550" };
 
 function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
   const cx=160,cy=160,R=97,W_TRACK=22,W_ARC=13,W_SEL=20,ri=58,GAP=2.5;
@@ -208,11 +208,11 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
     return `M${p1.x} ${p1.y} A${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y}`;
   }
   function moonCpPath() {
-    const rx2=ri*Math.abs(1-2*illum);
-    if(waxing){const sw2=illum<=0.5?0:1;return `M${cx} ${cy-ri} A${ri} ${ri} 0 0 1 ${cx} ${cy+ri} A${rx2} ${ri} 0 0 ${sw2} ${cx} ${cy-ri}Z`;}
-    else{const sw2=illum<=0.5?1:0;return `M${cx} ${cy-ri} A${ri} ${ri} 0 0 0 ${cx} ${cy+ri} A${rx2} ${ri} 0 0 ${sw2} ${cx} ${cy-ri}Z`;}
+    const r=ri, rx=r*Math.abs(1-2*illum);
+    const sweep=(illum<=0.5)?(waxing?0:1):(waxing?1:0);
+    if(waxing) return `M${cx},${cy-r} A${r},${r} 0 0 1 ${cx},${cy+r} A${rx},${r} 0 0 ${sweep} ${cx},${cy-r}`;
+    return `M${cx},${cy-r} A${r},${r} 0 0 0 ${cx},${cy+r} A${rx},${r} 0 0 ${sweep} ${cx},${cy-r}`;
   }
-  const craters=[[cx-18,cy-12,7],[cx+12,cy-8,4.5],[cx-8,cy+17,8],[cx+18,cy+22,4],[cx-22,cy+10,3.5],[cx+8,cy-22,3.5],[cx+28,cy+2,6]];
   const todayDot=angle!==null?polar(cx,cy,R,angle):null;
   const today=new Date();
   const dateLabel=`${today.getMonth()+1}월 ${today.getDate()}일`;
@@ -235,34 +235,18 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
           <feGaussianBlur stdDeviation="3" result="b"/>
           <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
-        <radialGradient id={`mg-${uid}`} cx="36%" cy="32%" r="68%">
-          <stop offset="0%"   stopColor="#fff8dc"/>
-          <stop offset="45%"  stopColor="#f5d060"/>
-          <stop offset="100%" stopColor="#b07818"/>
+        <radialGradient id={`mg-${uid}`} cx="35%" cy="35%" r="70%">
+          <stop offset="0%"   stopColor="#fffdf0"/>
+          <stop offset="60%"  stopColor="#e2c07d"/>
+          <stop offset="100%" stopColor="#7a5a20"/>
         </radialGradient>
-        <radialGradient id={`msh-${uid}`} cx="68%" cy="70%" r="55%">
-          <stop offset="0%"   stopColor="#1a0c00" stopOpacity="0.45"/>
-          <stop offset="100%" stopColor="#1a0c00" stopOpacity="0"/>
-        </radialGradient>
-        <radialGradient id={`gls-${uid}`} cx="35%" cy="28%" r="45%">
-          <stop offset="0%"   stopColor="white" stopOpacity="0.22"/>
-          <stop offset="100%" stopColor="white" stopOpacity="0"/>
-        </radialGradient>
-        {craters.map((_,i)=>(
-          <radialGradient key={i} id={`cr-${uid}-${i}`} cx="35%" cy="30%" r="65%">
-            <stop offset="0%"   stopColor="#fff0a0" stopOpacity="0.55"/>
-            <stop offset="60%"  stopColor="#c89020" stopOpacity="0.18"/>
-            <stop offset="100%" stopColor="#7a4800" stopOpacity="0.55"/>
-          </radialGradient>
-        ))}
         {illum>0&&illum<1&&<clipPath id={`mcp-${uid}`}><path d={moonCpPath()}/></clipPath>}
-        <clipPath id={`cc-${uid}`}><circle cx={cx} cy={cy} r={ri}/></clipPath>
       </defs>
 
       {/* 레이어1: 시계 */}
-      <circle cx={cx} cy={cy} r={152} fill="#0c0c28" filter="url(#clk-shadow)"/>
-      <circle cx={cx} cy={cy} r={151} fill="#0c0c28" stroke="#1a1a40" strokeWidth="1"/>
-      <circle cx={cx} cy={cy} r={R} fill="none" stroke="#111130" strokeWidth={W_TRACK}/>
+      <circle cx={cx} cy={cy} r={152} fill="#141438" filter="url(#clk-shadow)"/>
+      <circle cx={cx} cy={cy} r={151} fill="#141438" stroke="#30306a" strokeWidth="1.5"/>
+      <circle cx={cx} cy={cy} r={R} fill="none" stroke="#1e1e50" strokeWidth={W_TRACK}/>
       {PA.map(pa=>{
         const ph=PHASES.find(p=>p.id===pa.id);
         const isActive=selId?pa.id===selId:pa.id===todayId;
@@ -270,12 +254,12 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
         return (
           <g key={pa.id}>
             {isActive&&<path d={donutArc(pa.s,pa.e)} fill="none" stroke={ph.color} strokeWidth={W_SEL+12} strokeLinecap="round" opacity="0.1" filter="url(#arc-glow)"/>}
-            <path d={donutArc(pa.s,pa.e)} fill="none" stroke={ph.color} strokeWidth={isActive?W_SEL:W_ARC} strokeLinecap="round" opacity={isActive?0.95:isToday?0.45:0.14} style={{cursor:"pointer",transition:"all 0.35s"}} onClick={()=>onSelect(pa.id)}/>
+            <path d={donutArc(pa.s,pa.e)} fill="none" stroke={ph.color} strokeWidth={isActive?W_SEL:W_ARC} strokeLinecap="round" opacity={isActive?0.95:isToday?0.55:0.32} style={{cursor:"pointer",transition:"all 0.35s"}} onClick={()=>onSelect(pa.id)}/>
             <path d={donutArc(pa.s,pa.e,0)} fill="none" stroke="transparent" strokeWidth={W_TRACK+16} style={{cursor:"pointer"}} onClick={()=>onSelect(pa.id)}/>
           </g>
         );
       })}
-      {[0,7,14,21].map(day=>{const deg=(day/28)*360;const a=polar(cx,cy,R+W_TRACK/2+4,deg);const b=polar(cx,cy,R+W_TRACK/2+10,deg);return <line key={day} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#30305a" strokeWidth="1.5" strokeLinecap="round"/>;})}
+      {[0,7,14,21].map(day=>{const deg=(day/28)*360;const a=polar(cx,cy,R+W_TRACK/2+4,deg);const b=polar(cx,cy,R+W_TRACK/2+10,deg);return <line key={day} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#5050a0" strokeWidth="1.5" strokeLinecap="round"/>;})}
       {Array.from({length:28}).map((_,i)=>{if(i%7===0)return null;const p=polar(cx,cy,R+W_TRACK/2+7,(i/28)*360);return <circle key={i} cx={p.x} cy={p.y} r={1} fill="#22224a"/>;}).filter(Boolean)}
       {todayDot&&<g filter="url(#dot-glow)"><circle cx={todayDot.x} cy={todayDot.y} r={9} fill="#0c0c28"/><circle cx={todayDot.x} cy={todayDot.y} r={6.5} fill={todayPhase?.color||"#7070c0"} opacity="0.95"/><circle cx={todayDot.x} cy={todayDot.y} r={2.8} fill="rgba(255,255,255,0.8)"/></g>}
 
@@ -283,30 +267,25 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
       {angle!==null&&<g style={{transform:`rotate(${angle}deg)`,transformOrigin:`${cx}px ${cy}px`,transition:ready?"transform 1.5s cubic-bezier(0.34,1.56,0.64,1)":"none"}}><line x1={cx} y1={cy} x2={cx} y2={cy-(R-8)} stroke={selPhase?.color||"#4040a0"} strokeWidth="2.2" strokeLinecap="round" opacity="0.45"/><line x1={cx} y1={cy} x2={cx} y2={cy-(R-8)} stroke="rgba(255,255,255,0.25)" strokeWidth="0.8" strokeLinecap="round"/></g>}
 
       {/* 레이어3: 달 */}
-      {illum>0.7&&<circle cx={cx} cy={cy} r={ri+10} fill="none" stroke="#e8c060" strokeWidth="12" opacity={((illum-0.7)*0.22).toFixed(2)}/>}
-      <circle cx={cx} cy={cy} r={ri} fill="#07071e"/>
-      <g clipPath={`url(#cc-${uid})`}>
-        {illum<=0?(
-          <circle cx={cx} cy={cy} r={ri} fill="#09091e"/>
-        ):illum>=1?(
-          <>
-            <circle cx={cx} cy={cy} r={ri} fill={`url(#mg-${uid})`}/>
-            <circle cx={cx} cy={cy} r={ri} fill={`url(#msh-${uid})`}/>
-            {craters.map(([x,y,cr],i)=><g key={i}><circle cx={x} cy={y} r={cr} fill={`url(#cr-${uid}-${i})`} stroke="#a06010" strokeWidth="0.5" opacity="0.7"/><circle cx={x-cr*0.28} cy={y-cr*0.28} r={cr*0.32} fill="white" opacity="0.25"/></g>)}
-            <circle cx={cx} cy={cy} r={ri} fill={`url(#gls-${uid})`}/>
-          </>
-        ):(
-          <>
-            <circle cx={cx} cy={cy} r={ri} fill="#09091e"/>
-            <g clipPath={`url(#mcp-${uid})`}>
-              <circle cx={cx} cy={cy} r={ri} fill={`url(#mg-${uid})`}/>
-              <circle cx={cx} cy={cy} r={ri} fill={`url(#msh-${uid})`}/>
-              {craters.map(([x,y,cr],i)=><g key={i}><circle cx={x} cy={y} r={cr} fill={`url(#cr-${uid}-${i})`} stroke="#a06010" strokeWidth="0.5" opacity="0.7"/><circle cx={x-cr*0.28} cy={y-cr*0.28} r={cr*0.32} fill="white" opacity="0.25"/></g>)}
-              <circle cx={cx} cy={cy} r={ri} fill={`url(#gls-${uid})`}/>
-            </g>
-          </>
-        )}
-      </g>
+      {illum>0.7&&<circle cx={cx} cy={cy} r={ri+10} fill="none" stroke="#e8c060" strokeWidth="14" opacity={((illum-0.7)*0.28).toFixed(2)}/>}
+      <circle cx={cx} cy={cy} r={ri} fill="#070715"/>
+      {illum<=0?(
+        <circle cx={cx} cy={cy} r={ri} fill="#150808"/>
+      ):illum>=1?(
+        <g>
+          <circle cx={cx} cy={cy} r={ri} fill={`url(#mg-${uid})`}/>
+          <circle cx={cx-13} cy={cy-17} r={7} fill="#403010" opacity="0.06"/>
+          <circle cx={cx+14} cy={cy+6}  r={10} fill="#403010" opacity="0.06"/>
+          <circle cx={cx-3}  cy={cy+20} r={6}  fill="#403010" opacity="0.04"/>
+        </g>
+      ):(
+        <g clipPath={`url(#mcp-${uid})`}>
+          <circle cx={cx} cy={cy} r={ri} fill={`url(#mg-${uid})`}/>
+          <circle cx={cx-13} cy={cy-17} r={7} fill="#403010" opacity="0.06"/>
+          <circle cx={cx+14} cy={cy+6}  r={10} fill="#403010" opacity="0.06"/>
+          <circle cx={cx-3}  cy={cy+20} r={6}  fill="#403010" opacity="0.04"/>
+        </g>
+      )}
       <circle cx={cx} cy={cy} r={ri} fill="none" stroke={selPhase?.color||"#252550"} strokeWidth="1.5" opacity="0.4"/>
 
       {/* 레이어4: 날짜 오버레이 */}
@@ -702,11 +681,11 @@ export default function App() {
                     <div>
                       <div style={{ fontSize:11,color:dp.text,background:dp.soft,display:"inline-block",padding:"3px 10px",borderRadius:100,fontWeight:600,letterSpacing:"0.07em",marginBottom:7 }}>{isToday?"현재 위상":"선택한 위상"}</div>
                       <div style={{ fontSize:28,fontFamily:"DM Serif Display,serif",color:dp.text }}>{dp.moon} {dp.name}</div>
-                      <div style={{ fontSize:13,color:dp.color,fontWeight:600,marginTop:3 }}>{dp.season} · {dp.keyword}</div>
+                      <div style={{ fontSize:13,color:dp.text,fontWeight:600,marginTop:3,opacity:0.8 }}>{dp.season} · {dp.keyword}</div>
                     </div>
                     <div style={{ fontSize:28,flexShrink:0,marginTop:4 }}>{dp.moon}</div>
                   </div>
-                  <div style={{ fontSize:14,color:C.muted,lineHeight:1.75 }}>{dp.description}</div>
+                  <div style={{ fontSize:14,color:"#aaaad0",lineHeight:1.75 }}>{dp.description}</div>
                   <div style={{ display:"flex",flexWrap:"wrap",gap:5,marginTop:10 }}>{dp.nutrients?.map(n=><span key={n} style={{ fontSize:10,padding:"3px 9px",background:dp.soft,color:dp.text,borderRadius:100,border:`1px solid ${dp.border}`,fontWeight:600 }}>{n}</span>)}</div>
                   {isToday&&stats&&<div style={{ display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:7,marginTop:12 }}><MiniStat label="사이클" value={`${stats.cycleDay}일차`} sub={`/${stats.avgCycle}일`} soft={dp.soft} textColor={dp.text}/><MiniStat label="이 위상" value={`${stats.dIn}일째`} sub={`/${stats.dTotal}일`} soft={dp.soft} textColor={dp.text}/><MiniStat label="다음 위상" value={`${stats.dLeft}일`} sub="후" soft={dp.soft} textColor={dp.text}/></div>}
                 </div>
