@@ -230,7 +230,7 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
   const todayDot=angle!==null?polar(cx,cy,R,angle):null;
   const today=new Date();
   const dateLabel=`${today.getMonth()+1}월 ${today.getDate()}일`;
-  const moonFilter=eclipse?'none':`drop-shadow(0 0 ${illum*15}px rgba(226,192,125,0.18))`;
+  const moonFilter=eclipse?'none':`drop-shadow(0 0 ${illum*22}px rgba(226,192,125,0.32)) drop-shadow(0 0 ${illum*8}px rgba(255,248,200,0.18))`;
 
   return (
     <svg viewBox="0 0 320 320" style={{ width:"100%",display:"block" }}>
@@ -319,8 +319,6 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
         )}
       </svg>
 
-      {/* 중심 링 */}
-      <circle cx={cx} cy={cy} r={ri} fill="none" stroke={selPhase?.color||"#252550"} strokeWidth="1.5" opacity="0.4"/>
 
       {/* 레이어4: 날짜 오버레이 */}
       {cycleDay!=null&&<>
