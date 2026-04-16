@@ -190,7 +190,7 @@ function StarField() {
   );
 }
 
-const C = { bg:"#07071e", card:"#0d0d2a", cardAlt:"#0a0a22", text:"#ede8f5", muted:"#9898c0", border:"#252550" };
+const C = { bg:"#07071e", card:"#0f0f30", cardAlt:"#0c0c28", text:"#ede8f5", muted:"#a8a8d0", border:"#2a2a5a" };
 
 function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
   const cx=160,cy=160,R=97,W_TRACK=22,W_ARC=13,W_SEL=20,ri=58,GAP=2.5;
@@ -266,25 +266,27 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
       {/* 레이어2: 바늘 */}
       {angle!==null&&<g style={{transform:`rotate(${angle}deg)`,transformOrigin:`${cx}px ${cy}px`,transition:ready?"transform 1.5s cubic-bezier(0.34,1.56,0.64,1)":"none"}}><line x1={cx} y1={cy} x2={cx} y2={cy-(R-8)} stroke={selPhase?.color||"#4040a0"} strokeWidth="2.2" strokeLinecap="round" opacity="0.45"/><line x1={cx} y1={cy} x2={cx} y2={cy-(R-8)} stroke="rgba(255,255,255,0.25)" strokeWidth="0.8" strokeLinecap="round"/></g>}
 
-      {/* 레이어3: 달 */}
-      {illum>0.7&&<circle cx={cx} cy={cy} r={ri+10} fill="none" stroke="#e8c060" strokeWidth="14" opacity={((illum-0.7)*0.28).toFixed(2)}/>}
+      {/* 레이어3: 달 (moon_phase.html 원본 기준) */}
+      {illum>0.7&&<circle cx={cx} cy={cy} r={ri+12} fill="none" stroke="#e8d080" strokeWidth="16" opacity={((illum-0.7)*0.3).toFixed(2)}/>}
       <circle cx={cx} cy={cy} r={ri} fill="#070715"/>
       {illum<=0?(
-        <circle cx={cx} cy={cy} r={ri} fill="#150808"/>
+        null
       ):illum>=1?(
         <g>
           <circle cx={cx} cy={cy} r={ri} fill={`url(#mg-${uid})`}/>
-          <circle cx={cx-13} cy={cy-17} r={7} fill="#403010" opacity="0.06"/>
-          <circle cx={cx+14} cy={cy+6}  r={10} fill="#403010" opacity="0.06"/>
-          <circle cx={cx-3}  cy={cy+20} r={6}  fill="#403010" opacity="0.04"/>
+          <circle cx={cx-18} cy={cy-22} r={7} fill="#403010" opacity="0.06"/>
+          <circle cx={cx+15} cy={cy+7}  r={10} fill="#403010" opacity="0.06"/>
+          <circle cx={cx-4}  cy={cy+22} r={6}  fill="#403010" opacity="0.04"/>
         </g>
       ):(
-        <g clipPath={`url(#mcp-${uid})`}>
-          <circle cx={cx} cy={cy} r={ri} fill={`url(#mg-${uid})`}/>
-          <circle cx={cx-13} cy={cy-17} r={7} fill="#403010" opacity="0.06"/>
-          <circle cx={cx+14} cy={cy+6}  r={10} fill="#403010" opacity="0.06"/>
-          <circle cx={cx-3}  cy={cy+20} r={6}  fill="#403010" opacity="0.04"/>
-        </g>
+        <>
+          <g clipPath={`url(#mcp-${uid})`}>
+            <circle cx={cx} cy={cy} r={ri} fill={`url(#mg-${uid})`}/>
+            <circle cx={cx-18} cy={cy-22} r={7} fill="#403010" opacity="0.06"/>
+            <circle cx={cx+15} cy={cy+7}  r={10} fill="#403010" opacity="0.06"/>
+            <circle cx={cx-4}  cy={cy+22} r={6}  fill="#403010" opacity="0.04"/>
+          </g>
+        </>
       )}
       <circle cx={cx} cy={cy} r={ri} fill="none" stroke={selPhase?.color||"#252550"} strokeWidth="1.5" opacity="0.4"/>
 
@@ -299,7 +301,7 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
 
 function MiniStat({ label, value, sub, soft, textColor }) {
   return (
-    <div style={{ background:soft,borderRadius:11,padding:"11px 6px",textAlign:"center" }}>
+    <div style={{ background:soft||"rgba(255,255,255,0.06)",borderRadius:11,padding:"11px 6px",textAlign:"center" }}>
       <div style={{ fontSize:11,color:textColor,opacity:0.65,marginBottom:4,fontWeight:500 }}>{label}</div>
       <div style={{ fontSize:22,fontWeight:700,color:textColor }}>{value}</div>
       <div style={{ fontSize:11,color:textColor,opacity:0.5 }}>{sub}</div>
@@ -317,7 +319,7 @@ function DdayRow({ stats }) {
           { title:"다음\n가임기까지", val:stats.inFertile?"가임기\n진행 중":stats.dToFertile<=0?"종료":`D-${stats.dToFertile}`, sub:stats.inFertile?"지금":fmtKo(stats.fertileStart), big:!stats.inFertile&&stats.dToFertile>0 },
           { title:"현재\n임신확률", val:`${stats.pPct}%`, sub:stats.pLabel, big:true, isProb:true },
         ].map((s,i)=>(
-          <div key={i} style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:"12px 8px",textAlign:"center" }}>
+          <div key={i} style={{ background:"rgba(255,255,255,0.05)",border:`1px solid ${C.border}`,borderRadius:14,padding:"12px 8px",textAlign:"center" }}>
             <div style={{ fontSize:11,color:C.muted,fontWeight:600,marginBottom:5,lineHeight:1.4,whiteSpace:"pre-line" }}>{s.title}</div>
             <div style={{ fontSize:s.big?24:14,fontWeight:700,color:s.isProb?pColor:C.text,lineHeight:1.3,whiteSpace:"pre-line" }}>{s.val}</div>
             <div style={{ fontSize:11,color:s.isProb?pColor:C.muted,marginTop:3,fontWeight:s.isProb?600:400 }}>{s.sub}</div>
@@ -685,7 +687,7 @@ export default function App() {
                     </div>
                     <div style={{ fontSize:28,flexShrink:0,marginTop:4 }}>{dp.moon}</div>
                   </div>
-                  <div style={{ fontSize:14,color:"#aaaad0",lineHeight:1.75 }}>{dp.description}</div>
+                  <div style={{ fontSize:14,color:"#c0c0e0",lineHeight:1.75 }}>{dp.description}</div>
                   <div style={{ display:"flex",flexWrap:"wrap",gap:5,marginTop:10 }}>{dp.nutrients?.map(n=><span key={n} style={{ fontSize:10,padding:"3px 9px",background:dp.soft,color:dp.text,borderRadius:100,border:`1px solid ${dp.border}`,fontWeight:600 }}>{n}</span>)}</div>
                   {isToday&&stats&&<div style={{ display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:7,marginTop:12 }}><MiniStat label="사이클" value={`${stats.cycleDay}일차`} sub={`/${stats.avgCycle}일`} soft={dp.soft} textColor={dp.text}/><MiniStat label="이 위상" value={`${stats.dIn}일째`} sub={`/${stats.dTotal}일`} soft={dp.soft} textColor={dp.text}/><MiniStat label="다음 위상" value={`${stats.dLeft}일`} sub="후" soft={dp.soft} textColor={dp.text}/></div>}
                 </div>
