@@ -198,24 +198,39 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
   const selPhase=PHASES.find(p=>p.id===displayId);
   const todayPhase=PHASES.find(p=>p.id===todayId);
   const uid=displayId||"none";
-  const MOON_CFG={ wolsik:{illum:0,waxing:null},choseung:{illum:0.14,waxing:true},sanghyun:{illum:0.5,waxing:true},boreum:{illum:1,waxing:null},hahyun:{illum:0.5,waxing:false},geumeum:{illum:0.14,waxing:false} };
+
+  // moon_phase.html 그대로: illum + waxing → 위상
+  const MOON_CFG={
+    wolsik:   {illum:0,    waxing:null,  eclipse:false},
+    choseung: {illum:0.20, waxing:true,  eclipse:false},
+    sanghyun: {illum:0.52, waxing:true,  eclipse:false},
+    boreum:   {illum:1.00, waxing:null,  eclipse:false},
+    hahyun:   {illum:0.52, waxing:false, eclipse:false},
+    geumeum:  {illum:0.20, waxing:false, eclipse:false},
+  };
   const mc=MOON_CFG[displayId]||MOON_CFG.wolsik;
-  const {illum,waxing}=mc;
+  const {illum,waxing,eclipse}=mc;
+
+  // moon_phase.html의 getPath 함수 — 좌표계 동일 (cx=100,cy=100,r=80)
+  function getPath(il, wx, r) {
+    const c=100, rx=r*Math.abs(1-2*il);
+    const sweep=(il<=0.5)?(wx?0:1):(wx?1:0);
+    if(wx===null) return `M${c-r},${c} a${r},${r} 0 1,0 ${r*2},0 a${r},${r} 0 1,0 -${r*2},0`;
+    return wx
+      ? `M${c},${c-r} A${r},${r} 0 0 1 ${c},${c+r} A${rx},${r} 0 0 ${sweep} ${c},${c-r}`
+      : `M${c},${c-r} A${r},${r} 0 0 0 ${c},${c+r} A${rx},${r} 0 0 ${sweep} ${c},${c-r}`;
+  }
 
   function donutArc(s,e,gap=GAP) {
     const s2=s+gap,e2=e-gap; if(e2-s2<1)return"";
     const p1=polar(cx,cy,R,s2),p2=polar(cx,cy,R,e2),large=(e2-s2)>180?1:0;
     return `M${p1.x} ${p1.y} A${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y}`;
   }
-  function moonCpPath() {
-    const r=ri, rx=r*Math.abs(1-2*illum);
-    const sweep=(illum<=0.5)?(waxing?0:1):(waxing?1:0);
-    if(waxing) return `M${cx},${cy-r} A${r},${r} 0 0 1 ${cx},${cy+r} A${rx},${r} 0 0 ${sweep} ${cx},${cy-r}`;
-    return `M${cx},${cy-r} A${r},${r} 0 0 0 ${cx},${cy+r} A${rx},${r} 0 0 ${sweep} ${cx},${cy-r}`;
-  }
+
   const todayDot=angle!==null?polar(cx,cy,R,angle):null;
   const today=new Date();
   const dateLabel=`${today.getMonth()+1}월 ${today.getDate()}일`;
+  const moonFilter=eclipse?'none':`drop-shadow(0 0 ${illum*15}px rgba(226,192,125,0.18))`;
 
   return (
     <svg viewBox="0 0 320 320" style={{ width:"100%",display:"block" }}>
@@ -235,12 +250,6 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
           <feGaussianBlur stdDeviation="3" result="b"/>
           <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
-        <radialGradient id={`mg-${uid}`} cx="35%" cy="35%" r="70%">
-          <stop offset="0%"   stopColor="#fffdf0"/>
-          <stop offset="60%"  stopColor="#e2c07d"/>
-          <stop offset="100%" stopColor="#7a5a20"/>
-        </radialGradient>
-        {illum>0&&illum<1&&<clipPath id={`mcp-${uid}`}><path d={moonCpPath()}/></clipPath>}
       </defs>
 
       {/* 레이어1: 시계 */}
@@ -250,50 +259,73 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
       {PA.map(pa=>{
         const ph=PHASES.find(p=>p.id===pa.id);
         const isActive=selId?pa.id===selId:pa.id===todayId;
-        const isToday=pa.id===todayId;
+        const isToday_arc=pa.id===todayId;
         return (
           <g key={pa.id}>
             {isActive&&<path d={donutArc(pa.s,pa.e)} fill="none" stroke={ph.color} strokeWidth={W_SEL+12} strokeLinecap="round" opacity="0.1" filter="url(#arc-glow)"/>}
-            <path d={donutArc(pa.s,pa.e)} fill="none" stroke={ph.color} strokeWidth={isActive?W_SEL:W_ARC} strokeLinecap="round" opacity={isActive?0.95:isToday?0.55:0.32} style={{cursor:"pointer",transition:"all 0.35s"}} onClick={()=>onSelect(pa.id)}/>
+            <path d={donutArc(pa.s,pa.e)} fill="none" stroke={ph.color} strokeWidth={isActive?W_SEL:W_ARC} strokeLinecap="round" opacity={isActive?0.95:isToday_arc?0.55:0.32} style={{cursor:"pointer",transition:"all 0.35s"}} onClick={()=>onSelect(pa.id)}/>
             <path d={donutArc(pa.s,pa.e,0)} fill="none" stroke="transparent" strokeWidth={W_TRACK+16} style={{cursor:"pointer"}} onClick={()=>onSelect(pa.id)}/>
           </g>
         );
       })}
       {[0,7,14,21].map(day=>{const deg=(day/28)*360;const a=polar(cx,cy,R+W_TRACK/2+4,deg);const b=polar(cx,cy,R+W_TRACK/2+10,deg);return <line key={day} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#5050a0" strokeWidth="1.5" strokeLinecap="round"/>;})}
       {Array.from({length:28}).map((_,i)=>{if(i%7===0)return null;const p=polar(cx,cy,R+W_TRACK/2+7,(i/28)*360);return <circle key={i} cx={p.x} cy={p.y} r={1} fill="#22224a"/>;}).filter(Boolean)}
-      {todayDot&&<g filter="url(#dot-glow)"><circle cx={todayDot.x} cy={todayDot.y} r={9} fill="#0c0c28"/><circle cx={todayDot.x} cy={todayDot.y} r={6.5} fill={todayPhase?.color||"#7070c0"} opacity="0.95"/><circle cx={todayDot.x} cy={todayDot.y} r={2.8} fill="rgba(255,255,255,0.8)"/></g>}
+      {todayDot&&<g filter="url(#dot-glow)"><circle cx={todayDot.x} cy={todayDot.y} r={9} fill="#141438"/><circle cx={todayDot.x} cy={todayDot.y} r={6.5} fill={todayPhase?.color||"#7070c0"} opacity="0.95"/><circle cx={todayDot.x} cy={todayDot.y} r={2.8} fill="rgba(255,255,255,0.8)"/></g>}
 
       {/* 레이어2: 바늘 */}
       {angle!==null&&<g style={{transform:`rotate(${angle}deg)`,transformOrigin:`${cx}px ${cy}px`,transition:ready?"transform 1.5s cubic-bezier(0.34,1.56,0.64,1)":"none"}}><line x1={cx} y1={cy} x2={cx} y2={cy-(R-8)} stroke={selPhase?.color||"#4040a0"} strokeWidth="2.2" strokeLinecap="round" opacity="0.45"/><line x1={cx} y1={cy} x2={cx} y2={cy-(R-8)} stroke="rgba(255,255,255,0.25)" strokeWidth="0.8" strokeLinecap="round"/></g>}
 
-      {/* 레이어3: 달 (moon_phase.html 원본 기준) */}
-      {illum>0.7&&<circle cx={cx} cy={cy} r={ri+12} fill="none" stroke="#e8d080" strokeWidth="16" opacity={((illum-0.7)*0.3).toFixed(2)}/>}
-      <circle cx={cx} cy={cy} r={ri} fill="#070715"/>
-      {illum<=0?(
-        null
-      ):illum>=1?(
-        <g>
-          <circle cx={cx} cy={cy} r={ri} fill={`url(#mg-${uid})`}/>
-          <circle cx={cx-18} cy={cy-22} r={7} fill="#403010" opacity="0.06"/>
-          <circle cx={cx+15} cy={cy+7}  r={10} fill="#403010" opacity="0.06"/>
-          <circle cx={cx-4}  cy={cy+22} r={6}  fill="#403010" opacity="0.04"/>
-        </g>
-      ):(
-        <>
-          <g clipPath={`url(#mcp-${uid})`}>
-            <circle cx={cx} cy={cy} r={ri} fill={`url(#mg-${uid})`}/>
-            <circle cx={cx-18} cy={cy-22} r={7} fill="#403010" opacity="0.06"/>
-            <circle cx={cx+15} cy={cy+7}  r={10} fill="#403010" opacity="0.06"/>
-            <circle cx={cx-4}  cy={cy+22} r={6}  fill="#403010" opacity="0.04"/>
-          </g>
-        </>
-      )}
+      {/* 레이어3: 달 — moon_phase.html 코드 그대로, nested <svg>로 중심에 배치 */}
+      <circle cx={cx} cy={cy} r={ri} fill="#07071e"/>
+      <svg x={cx-ri} y={cy-ri} width={ri*2} height={ri*2} viewBox="0 0 200 200" overflow="visible"
+           style={{filter:moonFilter}}>
+        <defs>
+          <radialGradient id={`mG-${uid}`} cx="35%" cy="35%" r="70%">
+            <stop offset="0%"  stopColor="#fffdf0"/>
+            <stop offset="60%" stopColor="#e2c07d"/>
+            <stop offset="100%" stopColor="#7a5a20"/>
+          </radialGradient>
+          {!eclipse&&illum>0&&illum<1&&(
+            <clipPath id={`cp-${uid}`}>
+              <path d={getPath(illum,waxing,80)}/>
+            </clipPath>
+          )}
+        </defs>
+
+        {eclipse?(
+          <>
+            <circle cx="100" cy="100" r="80" fill="#150808"/>
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#4d2525" strokeWidth="0.5"/>
+          </>
+        ):(
+          <>
+            <circle cx="100" cy="100" r="80" fill="#070715"/>
+            {illum>=1?(
+              <g>
+                <circle cx="100" cy="100" r="80" fill={`url(#mG-${uid})`}/>
+                <circle cx="75"  cy="70"  r="10" fill="#403010" opacity="0.06"/>
+                <circle cx="120" cy="110" r="14" fill="#403010" opacity="0.06"/>
+                <circle cx="95"  cy="130" r="8"  fill="#403010" opacity="0.04"/>
+              </g>
+            ):(
+              <g clipPath={`url(#cp-${uid})`}>
+                <circle cx="100" cy="100" r="80" fill={`url(#mG-${uid})`}/>
+                <circle cx="75"  cy="70"  r="10" fill="#403010" opacity="0.06"/>
+                <circle cx="120" cy="110" r="14" fill="#403010" opacity="0.06"/>
+                <circle cx="95"  cy="130" r="8"  fill="#403010" opacity="0.04"/>
+              </g>
+            )}
+          </>
+        )}
+      </svg>
+
+      {/* 중심 링 */}
       <circle cx={cx} cy={cy} r={ri} fill="none" stroke={selPhase?.color||"#252550"} strokeWidth="1.5" opacity="0.4"/>
 
       {/* 레이어4: 날짜 오버레이 */}
       {cycleDay!=null&&<>
-        <rect x={cx-32} y={cy+ri-23} width={64} height={17} rx={8.5} fill="rgba(4,4,18,0.62)"/>
-        <text x={cx} y={cy+ri-11} textAnchor="middle" fontSize="9.5" fontWeight="600" fill="rgba(255,248,220,0.85)" fontFamily="DM Sans,sans-serif" letterSpacing="0.03em">{dateLabel}</text>
+        <rect x={cx-32} y={cy+ri-23} width={64} height={17} rx={8.5} fill="rgba(4,4,18,0.72)"/>
+        <text x={cx} y={cy+ri-11} textAnchor="middle" fontSize="9.5" fontWeight="600" fill="rgba(255,248,220,0.9)" fontFamily="DM Sans,sans-serif" letterSpacing="0.03em">{dateLabel}</text>
       </>}
     </svg>
   );
