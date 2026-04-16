@@ -18,7 +18,7 @@ const db   = getFirestore(firebaseApp);
 const PHASES = [
   {
     id:"wolsik", name:"월식", moon:"🌑", season:"월경기", dayRange:[1,5],
-    color:"#9898cc", soft:"rgba(152,152,204,0.14)", border:"rgba(152,152,204,0.28)", text:"#c0c4f0",
+    color:"#6868a0", soft:"rgba(152,152,204,0.14)", border:"rgba(152,152,204,0.28)", text:"#c0c4f0",
     description:"달이 숨는 시간. 자궁이 리셋되며 철분이 빠져나가는 시기예요. 몸이 보내는 신호에 귀 기울여요.",
     keyword:"휴식과 내려놓기",
     nutrients:["철분","마그네슘","오메가3","비타민C"],
@@ -28,7 +28,7 @@ const PHASES = [
   },
   {
     id:"choseung", name:"초승달", moon:"🌒", season:"회복기", dayRange:[6,9],
-    color:"#5bbaa0", soft:"rgba(91,186,160,0.14)", border:"rgba(91,186,160,0.28)", text:"#7dd4bc",
+    color:"#8e8080", soft:"rgba(91,186,160,0.14)", border:"rgba(91,186,160,0.28)", text:"#7dd4bc",
     description:"달이 서서히 차오르는 시간. 에너지가 회복되며 몸이 깨어나기 시작해요.",
     keyword:"회복과 새로운 출발",
     nutrients:["단백질","아연","비타민B군","프로바이오틱스"],
@@ -38,7 +38,7 @@ const PHASES = [
   },
   {
     id:"sanghyun", name:"상현달", moon:"🌓", season:"활력기", dayRange:[10,13],
-    color:"#4a9e68", soft:"rgba(74,158,104,0.14)", border:"rgba(74,158,104,0.28)", text:"#6abf88",
+    color:"#b49858", soft:"rgba(74,158,104,0.14)", border:"rgba(74,158,104,0.28)", text:"#6abf88",
     description:"달이 반쯤 차오른 활기찬 시간. 에스트로겐이 높아져 에너지와 집중력이 피크에 가까워요.",
     keyword:"성장과 창의적 도전",
     nutrients:["식이섬유","비타민D","오메가3","인돌-3-카비놀"],
@@ -48,7 +48,7 @@ const PHASES = [
   },
   {
     id:"boreum", name:"보름달", moon:"🌕", season:"배란기", dayRange:[14,16],
-    color:"#d4a050", soft:"rgba(212,160,80,0.14)", border:"rgba(212,160,80,0.28)", text:"#e8c870",
+    color:"#e8c040", soft:"rgba(212,160,80,0.14)", border:"rgba(212,160,80,0.28)", text:"#e8c870",
     description:"달이 가장 환하게 빛나는 시간. 에너지와 자신감이 최고조예요. 세상을 향해 빛나는 시기.",
     keyword:"표현과 빛남",
     nutrients:["아연","비타민B6","항산화(C·E)","수분"],
@@ -58,7 +58,7 @@ const PHASES = [
   },
   {
     id:"hahyun", name:"하현달", moon:"🌖", season:"안정기", dayRange:[17,23],
-    color:"#c08060", soft:"rgba(192,128,96,0.14)", border:"rgba(192,128,96,0.28)", text:"#d8a080",
+    color:"#b49858", soft:"rgba(192,128,96,0.14)", border:"rgba(192,128,96,0.28)", text:"#d8a080",
     description:"달이 포근하게 기울기 시작하는 시간. 나에게로 돌아오는 시간. 안정적이고 내향적인 에너지예요.",
     keyword:"돌봄과 정리",
     nutrients:["복합탄수화물","칼슘","마그네슘","트립토판"],
@@ -68,7 +68,7 @@ const PHASES = [
   },
   {
     id:"geumeum", name:"그믐달", moon:"🌘", season:"PMS", dayRange:[24,28],
-    color:"#b07060", soft:"rgba(176,112,96,0.14)", border:"rgba(176,112,96,0.28)", text:"#d09080",
+    color:"#8e8080", soft:"rgba(176,112,96,0.14)", border:"rgba(176,112,96,0.28)", text:"#d09080",
     description:"달이 고요히 사라지기 직전. PMS 증상이 나타날 수 있어요. 몸이 보내는 신호에 귀를 기울이는 시간.",
     keyword:"내면과 고요",
     nutrients:["마그네슘","칼슘","비타민B6","오메가3","칼륨"],
@@ -268,8 +268,6 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
           </g>
         );
       })}
-      {[0,7,14,21].map(day=>{const deg=(day/28)*360;const a=polar(cx,cy,R+W_TRACK/2+4,deg);const b=polar(cx,cy,R+W_TRACK/2+10,deg);return <line key={day} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#5050a0" strokeWidth="1.5" strokeLinecap="round"/>;})}
-      {Array.from({length:28}).map((_,i)=>{if(i%7===0)return null;const p=polar(cx,cy,R+W_TRACK/2+7,(i/28)*360);return <circle key={i} cx={p.x} cy={p.y} r={1} fill="#22224a"/>;}).filter(Boolean)}
       {todayDot&&<g filter="url(#dot-glow)"><circle cx={todayDot.x} cy={todayDot.y} r={9} fill="#141438"/><circle cx={todayDot.x} cy={todayDot.y} r={6.5} fill={todayPhase?.color||"#7070c0"} opacity="0.95"/><circle cx={todayDot.x} cy={todayDot.y} r={2.8} fill="rgba(255,255,255,0.8)"/></g>}
 
       {/* 레이어2: 바늘 */}
