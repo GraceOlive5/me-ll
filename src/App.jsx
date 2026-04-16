@@ -255,7 +255,6 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
       {/* 레이어1: 시계 */}
       <circle cx={cx} cy={cy} r={152} fill="#141438" filter="url(#clk-shadow)"/>
       <circle cx={cx} cy={cy} r={151} fill="#141438" stroke="#30306a" strokeWidth="1.5"/>
-      <circle cx={cx} cy={cy} r={R} fill="none" stroke="#1e1e50" strokeWidth={W_TRACK}/>
       {PA.map(pa=>{
         const ph=PHASES.find(p=>p.id===pa.id);
         const isActive=selId?pa.id===selId:pa.id===todayId;
@@ -318,11 +317,18 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
       </svg>
 
 
-      {/* 레이어4: 날짜 오버레이 */}
-      {cycleDay!=null&&<>
-        <rect x={cx-32} y={cy+ri-23} width={64} height={17} rx={8.5} fill="rgba(4,4,18,0.72)"/>
-        <text x={cx} y={cy+ri-11} textAnchor="middle" fontSize="9.5" fontWeight="600" fill="rgba(255,248,220,0.9)" fontFamily="DM Sans,sans-serif" letterSpacing="0.03em">{dateLabel}</text>
-      </>}
+      {/* 레이어4: 날짜 — 항상 중앙에 표시 */}
+      <text x={cx} y={cy+6} textAnchor="middle" fontSize="13" fontWeight="600"
+        fill="rgba(255,248,220,0.88)" fontFamily="DM Sans,sans-serif" letterSpacing="0.04em"
+        style={{filter:"drop-shadow(0 1px 3px rgba(0,0,0,0.6))"}}>
+        {dateLabel}
+      </text>
+      {cycleDay!=null&&(
+        <text x={cx} y={cy+22} textAnchor="middle" fontSize="9.5" fontWeight="500"
+          fill="rgba(255,248,220,0.45)" fontFamily="DM Sans,sans-serif" letterSpacing="0.06em">
+          {`Day ${cycleDay}`}
+        </text>
+      )}
     </svg>
   );
 }
