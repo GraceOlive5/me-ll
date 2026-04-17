@@ -194,17 +194,13 @@ const C = { bg:"#07071e", card:"#0f0f30", cardAlt:"#0c0c28", text:"#ede8f5", mut
 
 
 function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
-  const cx = 160, cy = 160, R = 105; // 반지름 최적화
-  const ri = 70; // 중앙 달 크기
+  const cx = 160, cy = 160, R = 110; 
+  const ri = 75; // 중앙 달 공간
   const displayId = selId || todayId;
   const selPhase = PHASES.find(p => p.id === displayId);
   const todayPhase = PHASES.find(p => p.id === todayId);
 
-  // 현재 선택된 주기의 인덱스 (유리 조각의 위치 계산용)
-  const activeIdx = PA.findIndex(pa => pa.id === displayId);
-  const activeArc = PA[activeIdx];
-
-  // 달 설정
+  // 달 위상 데이터 (사라진 달 복구)
   const MOON_CFG = {
     wolsik: { illum: 0, waxing: null },
     choseung: { illum: 0.20, waxing: true },
@@ -213,87 +209,101 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
     hahyun: { illum: 0.52, waxing: false },
     geumeum: { illum: 0.20, waxing: false },
   };
-  const { illum, waxing } = MOON_CFG[displayId] || MOON_CFG.wolsik;
+  const mc = MOON_CFG[displayId] || MOON_CFG.wolsik;
 
-  // 부드러운 둥근 호(Arc)를 그리는 함수
-  function getArcPath(s, e, r, thickness) {
-    const innerR = r - thickness;
-    const outerR = r + thickness;
-    const startOuter = polar(cx, cy, outerR, s);
-    const endOuter = polar(cx, cy, outerR, e);
-    const startInner = polar(cx, cy, innerR, s);
-    const endInner = polar(cx, cy, innerR, e);
-    const largeArc = (e - s) > 180 ? 1 : 0;
-
-    return `
-      M ${startOuter.x} ${startOuter.y}
-      A ${outerR} ${outerR} 0 ${largeArc} 1 ${endOuter.x} ${endOuter.y}
-      L ${endInner.x} ${endInner.y}
-      A ${innerR} ${innerR} 0 ${largeArc} 0 ${startInner.x} ${startInner.y}
-      Z
-    `;
+  // 달의 모양을 계산하는 내부 함수
+  function getMoonPath(il, wx, r) {
+    const rx = r * Math.abs(1 - 2 * il);
+    const sw = (il <= 0.5) ? (wx ? 0 : 1) : (wx ? 1 : 0);
+    if (wx === null) return `M ${100-r},100 a ${r},${r} 0 1,0 ${r*2},0 a ${r},${r} 0 1,0 -${r*2},0`;
+    return wx 
+      ? `M 100,${100-r} A ${r},${r} 0 0 1 100,${100+r} A ${rx},${r} 0 0 ${sw} 100,${100-r}`
+      : `M 100,${100-r} A ${r},${r} 0 0 0 100,${100+r} A ${rx},${r} 0 0 ${sw} 100,${100-r}`;
   }
 
+  // 고급스러운 호(Arc)를 그리는 함수 (슬라이딩 시 자연스러운 곡선 유지)
+  function getArcPath(s, e, r, thickness) {
+    const innerR = r - thickness, outerR = r + thickness;
+    const startOuter = polar(cx, cy, outerR, s), endOuter = polar(cx, cy, outerR, e);
+    const startInner = polar(cx, cy, innerR, s), endInner = polar(cx, cy, innerR, e);
+    const largeArc = (e - s) > 180 ? 1 : 0;
+    return `M ${startOuter.x} ${startOuter.y} A ${outerR} ${outerR} 0 ${largeArc} 1 ${endOuter.x} ${endOuter.y} L ${endInner.x} ${endInner.y} A ${innerR} ${innerR} 0 ${largeArc} 0 ${startInner.x} ${startInner.y} Z`;
+  }
+
+  const activeArc = PA.find(pa => pa.id === displayId);
   const todayDot = angle !== null ? polar(cx, cy, R, angle) : null;
 
   return (
-    <div style={{ position: "relative", width: "300px", height: "300px", margin: "0 auto" }}>
-      {/* 1. 완벽한 원형 배경 (Glassmorphism) */}
+    <div style={{ position: "relative", width: "320px", height: "320px", margin: "0 auto" }}>
+      {/* 1. 모던한 정원 배경 (고밀도 글래스모피즘) */}
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
         borderRadius: "50%",
-        background: "rgba(255, 255, 255, 0.03)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        border: "1px solid rgba(255, 255, 255, 0.1)",
-        boxShadow: "0 20px 50px rgba(0,0,0,0.3), inset 0 0 20px rgba(255,255,255,0.05)",
+        background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08), rgba(255,255,255,0.02))",
+        backdropFilter: "blur(30px) saturate(150%)",
+        WebkitBackdropFilter: "blur(30px) saturate(150%)",
+        border: "1px solid rgba(255, 255, 255, 0.12)",
+        boxShadow: "0 25px 50px rgba(0,0,0,0.4), inset 0 0 15px rgba(255,255,255,0.05)",
         zIndex: 0
       }} />
 
       <svg viewBox="0 0 320 320" style={{ width: "100%", height: "100%", position: "relative", zIndex: 1, overflow: "visible" }}>
-        {/* 2. 전체 주기 바 (연한 가이드) */}
+        {/* 2. 배경 가이드 (은은한 실크 느낌) */}
         {PA.map(pa => (
           <path
-            key={`bg-${pa.id}`}
-            d={getArcPath(pa.s, pa.e, R, 10)}
-            fill="rgba(255,255,255,0.06)"
+            key={`guide-${pa.id}`}
+            d={getArcPath(pa.s, pa.e, R, 8)}
+            fill="rgba(255,255,255,0.03)"
             style={{ cursor: "pointer" }}
             onClick={() => onSelect(pa.id)}
           />
         ))}
 
-        {/* 3. 아이폰 스타일 '움직이는 유리' (Selector) */}
+        {/* 3. 슬라이딩 '유리 셀렉터' - 아이폰의 감성 인터랙션 */}
         {activeArc && (
           <path
-            d={getArcPath(activeArc.s, activeArc.e, R, 12)}
-            fill="rgba(255,255,255,0.2)"
-            stroke="rgba(255,255,255,0.4)"
+            d={getArcPath(activeArc.s, activeArc.e, R, 11)}
+            fill="rgba(255,255,255,0.15)"
+            stroke="rgba(255,255,255,0.3)"
             strokeWidth="0.5"
             style={{ 
-              transition: "all 0.6s cubic-bezier(0.23, 1, 0.32, 1)", // 아이폰 특유의 부드러운 감속
-              filter: "drop-shadow(0 0 10px rgba(255,255,255,0.2))"
+              transition: "all 0.8s cubic-bezier(0.19, 1, 0.22, 1)", // 아이폰 특유의 하이엔드 감속
+              filter: "drop-shadow(0 0 12px rgba(255,255,255,0.15))"
             }}
           />
         )}
 
-        {/* 4. 오늘 위치 (포인트) */}
+        {/* 4. 오늘 위치 (미니멀한 도트) */}
         {todayDot && (
-          <circle cx={todayDot.x} cy={todayDot.y} r={5} fill="#fff" 
-            style={{ filter: "drop-shadow(0 0 5px white)" }} />
+          <circle cx={todayDot.x} cy={todayDot.y} r={4.5} fill="#fff" 
+            style={{ filter: "drop-shadow(0 0 6px white)", opacity: 0.9 }} />
         )}
 
-        {/* 5. 중앙 컨텐츠 (달) */}
-        <circle cx={cx} cy={cy} r={ri} fill="rgba(0,0,0,0.2)" />
-        <g style={{ transform: `translate(${cx - 50}px, ${cy - 50}px)` }}>
-           {/* 여기에 기존의 달 렌더링 SVG 코드(getPath 등)를 넣으시면 됩니다 */}
-           <text x="50" y="55" textAnchor="middle" fill="#fff" fontSize="12" fontWeight="300">
-             {selPhase?.name || "오늘"}
-           </text>
+        {/* 5. 중앙 복구된 달 (달콤하고 신비로운 골드 톤) */}
+        <g style={{ transform: `translate(${cx - 100}px, ${cy - 100}px)` }}>
+          <defs>
+            <radialGradient id="moonGrad" cx="30%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="#FFFDF0" />
+              <stop offset="60%" stopColor="#E2C07D" />
+              <stop offset="100%" stopColor="#8A6A30" />
+            </radialGradient>
+            <clipPath id="moonClip">
+              <path d={getMoonPath(mc.illum, mc.waxing, 65)} />
+            </clipPath>
+          </defs>
+          
+          <circle cx="100" cy="100" r="65" fill="rgba(20,20,40,0.6)" />
+          <circle cx="100" cy="100" r="65" fill="url(#moonGrad)" clipPath="url(#moonClip)" 
+            style={{ transition: "all 1s ease-in-out", filter: `drop-shadow(0 0 ${mc.illum * 15}px rgba(226,192,125,0.3))` }} />
+          
+          <text x="100" y="105" textAnchor="middle" fill="#fff" fontSize="13" fontWeight="300" letterSpacing="0.05em" style={{ opacity: 0.9 }}>
+            {selPhase?.name}
+          </text>
         </g>
 
-        {/* 하단 날짜 정보 */}
-        <text x={cx} y={cy + 85} textAnchor="middle" fill="#fff" fontSize="14" opacity="0.9" fontWeight="300">
-          {new Date().getDate()}일 {selPhase?.id === todayId ? "(오늘)" : ""}
+        {/* 하단 세련된 텍스트 배치 */}
+        <text x={cx} y={cy + 85} textAnchor="middle" fill="#fff" fontSize="14" fontWeight="200" style={{ letterSpacing: "0.1em", opacity: 0.7 }}>
+          {new Date().getMonth() + 1}월 {new Date().getDate()}일
         </text>
       </svg>
     </div>
