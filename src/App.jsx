@@ -191,11 +191,9 @@ function StarField() {
 }
 
 const C = { bg:"#07071e", card:"#0f0f30", cardAlt:"#0c0c28", text:"#ede8f5", muted:"#a8a8d0", border:"#2a2a5a" };
-/* 수정된 Clock 컴포넌트 - 이 부분만 기존 코드에서 교체하세요 */
-
 function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
-  const cx = 160, cy = 160, R = 102, ri = 62, GAP = 4;
-  const W_INNER = R - 12, W_OUTER = R + 12; // 유리 호 두께
+  const cx = 160, cy = 160, R = 100, ri = 65, GAP = 4;
+  const W_INNER = R - 14, W_OUTER = R + 14; 
   const displayId = selId || todayId;
   const selPhase = PHASES.find(p => p.id === displayId);
   const todayPhase = PHASES.find(p => p.id === todayId);
@@ -220,7 +218,7 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
       : `M${c},${c - r} A${r},${r} 0 0 0 ${c},${c + r} A${rx},${r} 0 0 ${sw} ${c},${c - r}`;
   }
 
-  // 세련된 유리 조각 경로 (Round Cap 효과 포함)
+  // 더 부드러운 호(Arc)를 그리는 함수
   function glassArc(s, e, rI, rO, gap = GAP) {
     const s2 = s + gap, e2 = e - gap; if (e2 - s2 < 1) return "";
     const large = (e2 - s2) > 180 ? 1 : 0;
@@ -230,127 +228,94 @@ function Clock({ angle, selId, todayId, onSelect, ready, cycleDay }) {
   }
 
   const todayDot = angle !== null ? polar(cx, cy, R, angle) : null;
-  const today = new Date();
-  const dateLabel = `${today.getMonth() + 1}월 ${today.getDate()}일`;
-  const moonFilter = eclipse ? 'none' : `drop-shadow(0 0 ${illum * 25}px rgba(226,192,125,0.4)) drop-shadow(0 0 ${illum * 10}px rgba(255,248,200,0.2))`;
+  const moonFilter = eclipse ? 'none' : `drop-shadow(0 0 ${illum * 20}px rgba(226,192,125,0.35))`;
 
   return (
-    <div style={{ position: "relative", width: "100%", padding: "20px 0" }}>
-      {/* 1. 글래스모피즘 메인 패널 배경 */}
+    <div style={{ position: "relative", width: "100%", padding: "10px 0" }}>
+      {/* 글래스모피즘 배경 레이어 */}
       <div style={{
-        position: "absolute", top: "10%", left: "10%", right: "10%", bottom: "10%",
+        position: "absolute", top: "8%", left: "8%", right: "8%", bottom: "8%",
         borderRadius: "50%",
-        backdropFilter: "blur(30px) saturate(150%)",
-        WebkitBackdropFilter: "blur(30px) saturate(150%)",
-        background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08), rgba(255,255,255,0.02))",
-        border: "1px solid rgba(255,255,255,0.12)",
-        boxShadow: "0 20px 50px rgba(0,0,0,0.4), inset 0 0 20px rgba(255,255,255,0.05)",
+        backdropFilter: "blur(25px) saturate(160%)",
+        WebkitBackdropFilter: "blur(25px) saturate(160%)",
+        background: "rgba(255, 255, 255, 0.03)",
+        border: "1px solid rgba(255, 255, 255, 0.1)",
+        boxShadow: "inset 0 0 30px rgba(255,255,255,0.05), 0 15px 35px rgba(0,0,0,0.4)",
         zIndex: 0
       }} />
 
       <svg viewBox="0 0 320 320" style={{ width: "100%", display: "block", position: "relative", zIndex: 1, overflow: "visible" }}>
         <defs>
-          {/* 끈적한 물방울 느낌을 위한 SVG 필터 (선택 사항) */}
-          <filter id="goo">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
-            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+          {/* 끈적한 이동 효과를 위한 Gooey 필터 */}
+          <filter id="gooey-effect">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="gooey" />
           </filter>
         </defs>
 
-        {/* 주기 표시 바 (Glass Arcs) */}
-        {PA.map(pa => {
-          const ph = PHASES.find(p => p.id === pa.id);
-          const isActive = selId ? pa.id === selId : pa.id === todayId;
-          
-          // 인터랙션: 선택 시 끈적하게 팽창하는 수치
-          const rI = isActive ? W_INNER - 6 : W_INNER;
-          const rO = isActive ? W_OUTER + 6 : W_OUTER;
-          const col = ph.color;
-          const r = parseInt(col.slice(1, 3), 16), g = parseInt(col.slice(3, 5), 16), b = parseInt(col.slice(5, 7), 16);
-          
-          const fillA = isActive ? 0.35 : 0.08;
-          const strokeA = isActive ? 0.8 : 0.2;
-          const springConfig = "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)";
-
-          return (
-            <g key={pa.id} style={{ cursor: "pointer" }} onClick={() => onSelect(pa.id)}>
-              {/* 활성화 시 배경 광원 */}
-              {isActive && (
-                <path d={glassArc(pa.s, pa.e, rI - 3, rO + 3)} 
-                  fill={`rgba(${r},${g},${b},0.15)`} 
-                  style={{ filter: "blur(12px)", transition: springConfig }} 
-                />
-              )}
-              {/* 메인 유리 호 */}
-              <path d={glassArc(pa.s, pa.e, rI, rO)}
-                fill={`rgba(${r},${g},${b},${fillA})`}
-                stroke={`rgba(${r},${g},${b},${strokeA})`}
-                strokeWidth="0.5"
-                style={{ transition: springConfig }}
+        {/* 주기 표시 바 (Gooey 필터 적용 영역) */}
+        <g filter="url(#gooey-effect)">
+          {PA.map(pa => {
+            const ph = PHASES.find(p => p.id === pa.id);
+            const isActive = selId ? pa.id === selId : pa.id === todayId;
+            const rI = isActive ? W_INNER - 5 : W_INNER;
+            const rO = isActive ? W_OUTER + 5 : W_OUTER;
+            const col = ph.color;
+            const r = parseInt(col.slice(1, 3), 16), g = parseInt(col.slice(3, 5), 16), b = parseInt(col.slice(5, 7), 16);
+            
+            return (
+              <path 
+                key={pa.id}
+                d={glassArc(pa.s, pa.e, rI, rO)}
+                fill={`rgba(${r},${g},${b}, ${isActive ? 0.4 : 0.12})`}
+                onClick={() => onSelect(pa.id)}
+                style={{ cursor: "pointer", transition: "all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
               />
-              {/* 상단 반사광 (Glossy Look) */}
-              <path d={glassArc(pa.s, pa.e, rO - 4, rO - 1, GAP + 2)}
-                fill="rgba(255,255,255,0.15)"
-                style={{ transition: springConfig, opacity: isActive ? 1 : 0.3 }}
-              />
-            </g>
-          );
-        })}
+            );
+          })}
+        </g>
 
-        {/* 오늘 위치 표시기 (Glow Dot) */}
+        {/* 오늘 위치 포인트 */}
         {todayDot && (
-          <g style={{ transition: "all 0.8s ease" }}>
-            <circle cx={todayDot.x} cy={todayDot.y} r={12} fill={todayPhase?.soft} style={{ filter: "blur(6px)" }} />
-            <circle cx={todayDot.x} cy={todayDot.y} r={6} fill={todayPhase?.color} stroke="#fff" strokeWidth="1.5" />
+          <g style={{ filter: "drop-shadow(0 0 8px white)" }}>
+            <circle cx={todayDot.x} cy={todayDot.y} r={7} fill="#fff" />
+            <circle cx={todayDot.x} cy={todayDot.y} r={4} fill={todayPhase?.color || "#fff"} />
           </g>
         )}
 
-        {/* 중앙 달 영역 */}
-        <circle cx={cx} cy={cy} r={ri} fill="rgba(3,3,15,0.4)" />
-        
-        <svg x={cx - ri} y={cy - ri} width={ri * 2} height={ri * 2} viewBox="0 0 200 200" overflow="visible"
-          style={{ filter: moonFilter, transition: "all 1s ease-in-out" }}>
+        {/* 중앙 달 & 텍스트 */}
+        <circle cx={cx} cy={cy} r={ri} fill="rgba(10,10,30,0.5)" />
+        <svg x={cx - ri} y={cy - ri} width={ri * 2} height={ri * 2} viewBox="0 0 200 200" style={{ filter: moonFilter }}>
           <defs>
             <radialGradient id={`mG-${uid}`} cx="30%" cy="30%" r="70%">
               <stop offset="0%" stopColor="#fffef0" />
-              <stop offset="50%" stopColor="#e2c07d" />
+              <stop offset="60%" stopColor="#e2c07d" />
               <stop offset="100%" stopColor="#8a6a30" />
             </radialGradient>
             {!eclipse && illum > 0 && illum < 1 && (
               <clipPath id={`cp-${uid}`}><path d={getPath(illum, waxing, 80)} /></clipPath>
             )}
           </defs>
-          {eclipse ? (
-            <circle cx="100" cy="100" r="80" fill="#1a0a0a" stroke="#4d2525" />
-          ) : (
-            <>
-              <circle cx="100" cy="100" r="80" fill="#070718" />
-              <g clipPath={illum > 0 && illum < 1 ? `url(#cp-${uid})` : undefined}>
-                <circle cx="100" cy="100" r="80" fill={`url(#mG-${uid})`} />
-                {/* 달 표면 질감 디테일 */}
-                <circle cx="60" cy="60" r="12" fill="#000" opacity="0.05" />
-                <circle cx="130" cy="100" r="18" fill="#000" opacity="0.05" />
-                <circle cx="90" cy="140" r="10" fill="#000" opacity="0.04" />
-              </g>
-            </>
-          )}
+          <circle cx="100" cy="100" r={80} fill="#0a0a20" />
+          <g clipPath={illum > 0 && illum < 1 ? `url(#cp-${uid})` : undefined}>
+            <circle cx="100" cy="100" r={80} fill={`url(#mG-${uid})`} />
+          </g>
         </svg>
 
-        {/* 중앙 텍스트 정보 */}
-        <g style={{ pointerEvents: "none" }}>
-          <text x={cx} y={cy + 5} textAnchor="middle" fontSize="13" fontWeight="600" fill="#fff" opacity="0.9" fontFamily="Pretendard, sans-serif">
-            {dateLabel}
+        <text x={cx} y={cy + 6} textAnchor="middle" fontSize="14" fontWeight="600" fill="#fff" style={{ pointerEvents: "none" }}>
+          {new Date().getMonth() + 1}월 {new Date().getDate()}일
+        </text>
+        {cycleDay && (
+          <text x={cx} y={cy + 22} textAnchor="middle" fontSize="10" fill={selPhase?.color} opacity="0.8" style={{ pointerEvents: "none" }}>
+            DAY {cycleDay}
           </text>
-          {cycleDay != null && (
-            <text x={cx} y={cy + 22} textAnchor="middle" fontSize="9" fontWeight="400" fill={selPhase?.color} opacity="0.7" letterSpacing="0.05em">
-              DAY {cycleDay}
-            </text>
-          )}
-        </g>
+        )}
       </svg>
     </div>
   );
 }
+
+
 function MiniStat({ label, value, sub, soft, textColor }) {
   return (
     <div style={{ background:soft||"rgba(255,255,255,0.06)",borderRadius:11,padding:"11px 6px",textAlign:"center" }}>
