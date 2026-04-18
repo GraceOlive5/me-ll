@@ -214,12 +214,13 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
   const MOON_CFG={wolsik:{il:0,wx:null},choseung:{il:0.2,wx:true},sanghyun:{il:0.5,wx:true},boreum:{il:1.0,wx:null},hahyun:{il:0.5,wx:false},geumeum:{il:0.2,wx:false}};
   const mc=MOON_CFG[displayId]||MOON_CFG.wolsik;
   function getMoonPath(il,wx,r){
-    if(wx===null)return `M${100-r},100 a${r},${r} 0 1,0 ${r*2},0 a${r},${r} 0 1,0 -${r*2},0`;
+    if(wx===null)return `M${cx-r},${cy} a${r},${r} 0 1,0 ${r*2},0 a${r},${r} 0 1,0 -${r*2},0`;
     const rx=r*Math.abs(1-2*il);
     const sw=il<=0.5?(wx?0:1):(wx?1:0);
-    return wx?`M100,${100-r} A${r},${r} 0 0 1 100,${100+r} A${rx},${r} 0 0 ${sw} 100,${100-r}`
-             :`M100,${100-r} A${r},${r} 0 0 0 100,${100+r} A${rx},${r} 0 0 ${sw} 100,${100-r}`;
+    return wx?`M${cx},${cy-r} A${r},${r} 0 0 1 ${cx},${cy+r} A${rx},${r} 0 0 ${sw} ${cx},${cy-r}`
+             :`M${cx},${cy-r} A${r},${r} 0 0 0 ${cx},${cy+r} A${rx},${r} 0 0 ${sw} ${cx},${cy-r}`;
   }
+
   function textArcPath(s,e){
     const mid=(s+e)/2,isBottom=mid>90&&mid<260,pad=3,Rl=R+26;
     if(!isBottom){const p1=polar(cx,cy,Rl,s+pad),p2=polar(cx,cy,Rl,e-pad);return `M${p1.x} ${p1.y} A${Rl} ${Rl} 0 ${(e-s-pad*2)>180?1:0} 1 ${p2.x} ${p2.y}`;}
@@ -231,7 +232,7 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
       <svg viewBox="0 0 320 320" style={{width:"100%",height:"100%",overflow:"visible",position:"relative",zIndex:1}}>
         <defs>
           {PA.map(pa=><path key={pa.id} id={`tp-${pa.id}`} d={textArcPath(pa.s,pa.e)} fill="none"/>)}
-          <clipPath id="mcp"><path d={getMoonPath(mc.il,mc.wx,60)}/></clipPath>
+          <clipPath id="mcp"><path d={getMoonPath(mc.il,mc.wx,40)}/></clipPath>
         </defs>
         <circle cx={cx} cy={cy} r={R} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="22"/>
         {PA.map(pa=>{
@@ -261,10 +262,9 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
             </text>
           );
         })}
-        <g transform={`translate(${cx-48},${cy-56})`}>
-          <circle cx="48" cy="48" r="40" fill="rgba(255,255,255,0.02)"/>
-          <circle cx="48" cy="48" r="40" fill="#E2C07D" clipPath="url(#mcp)" style={{transition:"all 1s ease",filter:"drop-shadow(0 0 12px rgba(226,192,125,0.6))"}}/>
-        </g>
+        <circle cx={cx} cy={cy} r="40" fill="rgba(255,255,255,0.02)"/>
+        <circle cx={cx} cy={cy} r="40" fill="#E2C07D" clipPath="url(#mcp)" style={{transition:"all 1s ease",filter:"drop-shadow(0 0 12px rgba(226,192,125,0.6))"}}/>
+
         {cycleDay!=null&&(
           <>
             <text x={cx} y={cy+22} textAnchor="middle" fontSize="32" fontWeight="300" fill={displayPhase?.color||"#fff"} fontFamily="system-ui,sans-serif" opacity="0.9">{cycleDay}</text>
