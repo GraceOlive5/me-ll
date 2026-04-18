@@ -227,8 +227,8 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
   }
   return(
     <div style={{position:"relative",width:320,height:320,margin:"0 auto"}}>
-      <div style={{position:"absolute",inset:10,borderRadius:"50%",background:"radial-gradient(circle at 30% 30%, rgba(255,255,255,0.06), rgba(255,255,255,0.01))",backdropFilter:"blur(15px)",border:"1px solid rgba(255,255,255,0.08)"}}/>
-      <svg viewBox="0 0 320 320" style={{width:"100%",height:"100%",overflow:"visible"}}>
+      <div style={{position:"absolute",inset:10,borderRadius:"50%",background:"rgba(15,15,50,0.6)",border:"1px solid rgba(255,255,255,0.08)",zIndex:0}}/>
+      <svg viewBox="0 0 320 320" style={{width:"100%",height:"100%",overflow:"visible",position:"relative",zIndex:1}}>
         <defs>
           {PA.map(pa=><path key={pa.id} id={`tp-${pa.id}`} d={textArcPath(pa.s,pa.e)} fill="none"/>)}
           <clipPath id="mcp"><path d={getMoonPath(mc.il,mc.wx,60)}/></clipPath>
