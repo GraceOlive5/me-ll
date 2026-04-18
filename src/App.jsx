@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, OAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
@@ -30,7 +30,7 @@ const PHASES = [
     tips:["온찜질을 아랫배에 15-20분 — 혈관 확장으로 경련 완화","수면 7-9시간 우선 확보, 낮잠도 괜찮아요","고강도 운동은 이 시기엔 쉬어가도 돼요","몸이 보내는 신호를 일기에 기록해두면 다음 달 대비 가능"],
   },
   {
-    id:"choseung", name:"초승달", moon:"🌒", season:"회복기", dayRange:[6,9],
+    id:"choseung", name:"초생", moon:"🌒", season:"회복기", dayRange:[6,9],
     color:"#5bbaa0", soft:"rgba(91,186,160,0.14)", border:"rgba(91,186,160,0.28)", text:"#7dd4bc",
     description:"달이 서서히 차오르는 시간. 에너지가 회복되며 몸이 깨어나기 시작해요.",
     keyword:"회복과 새로운 출발",
@@ -43,7 +43,7 @@ const PHASES = [
     tips:["새 프로젝트·목표를 구상하기 시작하세요","수면이 아직 중요해요, 7-8시간 확보","몸이 서서히 깨어나는 중, 무리하지 않게","가벼운 사교 활동부터 시작하기 좋아요"],
   },
   {
-    id:"sanghyun", name:"상현달", moon:"🌓", season:"활력기", dayRange:[10,13],
+    id:"sanghyun", name:"상현", moon:"🌓", season:"활력기", dayRange:[10,13],
     color:"#4a9e68", soft:"rgba(74,158,104,0.14)", border:"rgba(74,158,104,0.28)", text:"#6abf88",
     description:"달이 반쯤 차오른 활기찬 시간. 에스트로겐이 높아져 에너지와 집중력이 피크에 가까워요.",
     keyword:"성장과 창의적 도전",
@@ -56,7 +56,7 @@ const PHASES = [
     tips:["중요한 프로젝트·발표를 이 시기로 잡으면 유리해요","창의적 작업, 브레인스토밍에 에너지 집중","이 시기 운동 기록이 가장 좋게 나와요","새 기술·학습 시작하기 딱 좋은 때"],
   },
   {
-    id:"boreum", name:"보름달", moon:"🌕", season:"배란기", dayRange:[14,16],
+    id:"boreum", name:"보름", moon:"🌕", season:"배란기", dayRange:[14,16],
     color:"#d4a050", soft:"rgba(212,160,80,0.14)", border:"rgba(212,160,80,0.28)", text:"#e8c870",
     description:"달이 가장 환하게 빛나는 시간. 에너지와 자신감이 최고조예요. 세상을 향해 빛나는 시기.",
     keyword:"표현과 빛남",
@@ -69,7 +69,7 @@ const PHASES = [
     tips:["중요한 발표·협상·면접을 이 시기로 잡으면 유리해요","언어 능력·공감 능력 최고조, 소통이 필요한 일에 집중","자신감 있게 의사 표현하기 좋은 때","에너지 발산 위한 사회 활동 적극 계획"],
   },
   {
-    id:"hahyun", name:"하현달", moon:"🌖", season:"안정기", dayRange:[17,23],
+    id:"hahyun", name:"하현", moon:"🌖", season:"안정기", dayRange:[17,23],
     color:"#c08060", soft:"rgba(192,128,96,0.14)", border:"rgba(192,128,96,0.28)", text:"#d8a080",
     description:"달이 포근하게 기울기 시작하는 시간. 나에게로 돌아오는 시간. 안정적이고 내향적인 에너지예요.",
     keyword:"돌봄과 정리",
@@ -82,7 +82,7 @@ const PHASES = [
     tips:["정리·마무리 작업에 집중하기 좋은 때","혼자만의 창의적 작업, 독서에 에너지 집중","취침 1시간 전 화면 끄고 수면의 질 챙기기","감정 일기 쓰기 — 내면 탐색의 좋은 기회"],
   },
   {
-    id:"geumeum", name:"그믐달", moon:"🌘", season:"PMS", dayRange:[24,28],
+    id:"geumeum", name:"그믐", moon:"🌘", season:"PMS", dayRange:[24,28],
     color:"#b07060", soft:"rgba(176,112,96,0.14)", border:"rgba(176,112,96,0.28)", text:"#d09080",
     description:"달이 고요히 사라지기 직전. PMS 증상이 나타날 수 있어요. 몸이 보내는 신호에 귀를 기울이는 시간.",
     keyword:"내면과 고요",
@@ -214,7 +214,11 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
   const MOON_CFG={wolsik:{il:0,wx:null},choseung:{il:0.2,wx:true},sanghyun:{il:0.5,wx:true},boreum:{il:1.0,wx:null},hahyun:{il:0.5,wx:false},geumeum:{il:0.2,wx:false}};
   const mc=MOON_CFG[displayId]||MOON_CFG.wolsik;
   function getMoonPath(il,wx,r){
-    if(wx===null)return `M${cx-r},${cy} a${r},${r} 0 1,0 ${r*2},0 a${r},${r} 0 1,0 -${r*2},0`;
+    if(wx===null){
+  if(il===0) return `M0,0 L0,0`; // 월식: 완전 어둠
+  return `M${cx-r},${cy} a${r},${r} 0 1,0 ${r*2},0 a${r},${r} 0 1,0 -${r*2},0`;
+}
+
     const rx=r*Math.abs(1-2*il);
     const sw=il<=0.5?(wx?0:1):(wx?1:0);
     return wx?`M${cx},${cy-r} A${r},${r} 0 0 1 ${cx},${cy+r} A${rx},${r} 0 0 ${sw} ${cx},${cy-r}`
@@ -475,6 +479,105 @@ function loadNotifPrefs(){try{const r=localStorage.getItem(NOTIF_KEY);return r?J
 async function requestAndNotify(title,body){if(!("Notification" in window)){alert("이 브라우저는 알림을 지원하지 않아요");return;}let perm=Notification.permission;if(perm==="default")perm=await Notification.requestPermission();if(perm==="granted")new Notification(title,{body,icon:"/favicon.ico"});else alert("알림 권한이 거부됐어요.");}
 function Toggle({on,onChange}){return(<div onClick={()=>onChange(!on)} style={{width:44,height:24,borderRadius:12,flexShrink:0,cursor:"pointer",background:on?PHASES[1].color:"rgba(255,255,255,0.15)",position:"relative",transition:"background 0.2s"}}><div style={{position:"absolute",top:3,left:on?22:3,width:18,height:18,borderRadius:"50%",background:"white",boxShadow:"0 1px 4px rgba(0,0,0,0.3)",transition:"left 0.2s"}}/></div>);}
 
+ function PhaseBar({dp, stats, togglePhase}) {
+  const selIdx = PHASES.findIndex(p => p.id === dp?.id);
+  const [scale, setScale] = useState(1);
+  const prevIdx = useRef(-1);
+
+  useEffect(() => {
+    if (prevIdx.current !== selIdx && selIdx >= 0) {
+      setScale(1.08);
+      const t = setTimeout(() => setScale(1), 350);
+      prevIdx.current = selIdx;
+      return () => clearTimeout(t);
+    }
+  }, [selIdx]);
+
+  const W = 100 / PHASES.length;
+  const sel = selIdx >= 0 ? PHASES[selIdx] : null;
+
+  return (
+    <div style={{marginBottom:20}}>
+      <div style={{fontSize:10,color:C.muted,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:9,fontWeight:600}}>달 위상 탐색</div>
+      <div style={{position:"relative",borderRadius:18,background:"rgba(255,255,255,0.03)",border:`1px solid ${C.border}`,overflow:"hidden"}}>
+
+        {/* 슬라이딩 유리 인디케이터 */}
+        {sel && (
+          <>
+            {/* 메인 필 */}
+            <div style={{
+              position:"absolute", top:4, bottom:4,
+              left:`calc(${selIdx} * ${W}% + 3px)`,
+              width:`calc(${W}% - 6px)`,
+              borderRadius:12,
+              background:sel.soft,
+              border:`1.5px solid ${sel.border}`,
+              backdropFilter:"blur(12px)",
+              boxShadow:`0 0 16px ${sel.color}50, inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.25)`,
+              transform:`scaleY(${scale}) scaleX(${0.96 + scale * 0.04})`,
+              transformOrigin:"center",
+              transition:"left 0.55s cubic-bezier(0.34,1.56,0.64,1), border-color 0.3s, box-shadow 0.3s, transform 0.35s cubic-bezier(0.34,1.56,0.64,1)",
+              pointerEvents:"none", zIndex:1,
+            }}/>
+            {/* 유리 렌즈 하이라이트 */}
+            <div style={{
+              position:"absolute", top:4, bottom:4,
+              left:`calc(${selIdx} * ${W}% + 3px)`,
+              width:`calc(${W}% - 6px)`,
+              borderRadius:12,
+              background:"radial-gradient(ellipse at 35% 25%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.04) 55%, transparent 100%)",
+              transform:`scaleY(${scale}) scaleX(${0.96 + scale * 0.04})`,
+              transformOrigin:"center",
+              transition:"left 0.55s cubic-bezier(0.34,1.56,0.64,1), transform 0.35s cubic-bezier(0.34,1.56,0.64,1)",
+              pointerEvents:"none", zIndex:2,
+            }}/>
+            {/* 좌우 엣지 왜곡 글로우 */}
+            <div style={{
+              position:"absolute", top:0, bottom:0,
+              left:`calc(${selIdx} * ${W}% - 2px)`,
+              width:`calc(${W}% + 4px)`,
+              background:`radial-gradient(ellipse at left, ${sel.color}18 0%, transparent 40%) left / 50% 100% no-repeat, radial-gradient(ellipse at right, ${sel.color}18 0%, transparent 40%) right / 50% 100% no-repeat`,
+              transform:`scaleY(${scale})`,
+              transformOrigin:"center",
+              transition:"left 0.55s cubic-bezier(0.34,1.56,0.64,1), transform 0.35s cubic-bezier(0.34,1.56,0.64,1)",
+              pointerEvents:"none", zIndex:1,
+            }}/>
+          </>
+        )}
+
+        {/* 위상 아이템들 */}
+        <div style={{display:"flex",position:"relative",zIndex:3}}>
+          {PHASES.map((p,i) => {
+            const isSel = p.id === dp?.id;
+            const isToday = p.id === stats?.phase?.id;
+            return (
+              <button key={p.id} onClick={()=>togglePhase(p.id)} style={{
+                flex:1, padding:"11px 2px 9px", border:"none", background:"transparent",
+                display:"flex", flexDirection:"column", alignItems:"center", gap:3, cursor:"pointer",
+              }}>
+                <span style={{
+                  fontSize:17, lineHeight:1,
+                  filter:isSel?`drop-shadow(0 0 7px ${p.color})`:"none",
+                  transform:isSel?`scale(${scale})`:"scale(1)",
+                  transition:"filter 0.3s, transform 0.35s cubic-bezier(0.34,1.56,0.64,1)",
+                  display:"block",
+                }}>{p.moon}</span>
+                <span style={{
+                  fontSize:8.5, fontWeight:700, lineHeight:1.3, textAlign:"center",
+                  color:isSel?p.text:C.muted,
+                  transition:"color 0.3s",
+                }}>{p.name}</span>
+                {isToday && <div style={{width:3,height:3,borderRadius:"50%",background:p.color,marginTop:1}}/>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ 
 function MyPage({stats,periods,user}){
   const[prefs,setPrefs]=useState(loadNotifPrefs);
   const[notifPerm,setNotifPerm]=useState(typeof Notification!=="undefined"?Notification.permission:"unsupported");
@@ -721,17 +824,8 @@ export default function App(){
                   </div>
                 </div>
               )}
-              <div style={{fontSize:10,color:C.muted,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:9,fontWeight:600}}>달 위상 탐색</div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:20}}>
-                {PHASES.map(p=>{
-                  const on=p.id===dp?.id,tod=p.id===stats?.phase?.id;
-                  return(<button key={p.id} onClick={()=>togglePhase(p.id)} style={{background:on?p.soft:C.card,border:`1.5px solid ${on?p.border:C.border}`,borderRadius:14,padding:"12px 13px",textAlign:"left",color:C.text,transition:"all 0.22s",backdropFilter:"blur(8px)"}}>
-                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:13,color:on?p.text:C.text,fontWeight:700}}>{p.moon} {p.name}</span>{tod&&<span style={{fontSize:9,background:p.soft,color:p.text,padding:"2px 7px",borderRadius:100,fontWeight:600}}>오늘</span>}{on&&!tod&&<span style={{fontSize:9,background:p.soft,color:p.text,padding:"2px 7px",borderRadius:100,fontWeight:600}}>선택됨</span>}</div>
-                    <div style={{fontSize:11,color:C.muted}}>Day {p.dayRange[0]}-{p.dayRange[1]}</div>
-                    <div style={{marginTop:7,height:2,borderRadius:2,background:on?p.color:p.border,transition:"all 0.3s"}}/>
-                  </button>);
-                })}
-              </div>
+              <PhaseBar dp={dp} stats={stats} togglePhase={togglePhase}/>
+
             </>
           )
         )}
