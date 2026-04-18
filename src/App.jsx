@@ -251,7 +251,6 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
             </g>
           );
         })}
-        {angle!==null&&(
           {(()=>{
   const actPa=PA.find(pa=>pa.id===(selId||todayId));
   if(!actPa) return null;
@@ -283,7 +282,7 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
     </>
   );
 })()}
-
+{angle!==null&&(
           <g style={{transform:`rotate(${angle}deg)`,transformOrigin:`${cx}px ${cy}px`,transition:ready?"transform 1.5s cubic-bezier(0.34,1.56,0.64,1)":"none"}}>
             <line x1={cx} y1={cy} x2={cx} y2={cy-(R-10)} stroke={displayPhase?.color||"#aaa"} strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
             <line x1={cx} y1={cy} x2={cx} y2={cy-(R-10)} stroke="white" strokeWidth="0.6" strokeLinecap="round" opacity="0.2"/>
