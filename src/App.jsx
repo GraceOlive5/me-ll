@@ -198,7 +198,7 @@ function Clock({ angle, selId, todayId, onSelect }) {
   const displayId = selId || todayId || "wolsik";
   const selPhase = PHASES.find(p => p.id === displayId);
 
-  // 1. 달 위상 계산용 설정 (기존 데이터와 매칭)
+  // 달 위상 설정
   const MOON_CFG = {
     wolsik: { il: 0, wx: null },
     choseung: { il: 0.2, wx: true },
@@ -209,16 +209,17 @@ function Clock({ angle, selId, todayId, onSelect }) {
   };
   const mc = MOON_CFG[displayId] || MOON_CFG.wolsik;
 
-  // 2. 둥근 모서리 호를 그리는 함수 (바 끝처리를 둥글게)
-  const getRoundedPath = (s, e, r, thick) => {
+  // 1. 호(Arc)를 그리는 함수 (PA 데이터의 s, e 값을 그대로 사용)
+  const getArcPath = (s, e, r, thick) => {
     const oR = r + thick, iR = r - thick;
+    // 기존 코드의 polar 함수 활용
     const os = polar(cx, cy, oR, s), oe = polar(cx, cy, oR, e);
     const is = polar(cx, cy, iR, s), ie = polar(cx, cy, iR, e);
     const la = (e - s) > 180 ? 1 : 0;
-    return `M${os.x} ${os.y} A${oR} ${oR} 0 ${la} 1 ${oe.x} ${oe.y} A${thick} ${thick} 0 0 1 ${ie.x} ${ie.y} A${iR} ${iR} 0 ${la} 0 ${is.x} ${is.y} A${thick} ${thick} 0 0 1 ${os.x} ${os.y} Z`;
+    return `M${os.x} ${os.y} A${oR} ${oR} 0 ${la} 1 ${oe.x} ${oe.y} L${ie.x} ${ie.y} A${iR} ${iR} 0 ${la} 0 ${is.x} ${is.y} Z`;
   };
 
-  // 3. 달 모양(Path) 계산 함수
+  // 2. 달 모양 Path 계산
   const getMoonPath = (il, wx, r) => {
     const rx = r * Math.abs(1 - 2 * il);
     const sw = il <= 0.5 ? (wx ? 0 : 1) : (wx ? 1 : 0);
@@ -232,68 +233,63 @@ function Clock({ angle, selId, todayId, onSelect }) {
 
   return (
     <div style={{ position: "relative", width: "320px", height: "320px", margin: "0 auto" }}>
-      {/* 백그라운드 글래스 원형 레이어 */}
+      {/* 글래스 배경 */}
       <div style={{
         position: "absolute", inset: 0, borderRadius: "50%",
-        background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12), rgba(255,255,255,0.02))",
-        backdropFilter: "blur(25px) saturate(140%)",
-        WebkitBackdropFilter: "blur(25px) saturate(140%)",
-        border: "1px solid rgba(255, 255, 255, 0.15)",
-        boxShadow: "0 20px 45px rgba(0,0,0,0.35)",
+        background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), rgba(255,255,255,0.02))",
+        backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+        border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 20px 40px rgba(0,0,0,0.3)"
       }} />
 
       <svg viewBox="0 0 320 320" style={{ width: "100%", height: "100%", position: "relative", overflow: "visible" }}>
         <defs>
-          {/* 쫀득한 젤리 인터랙션을 위한 필터 */}
-          <filter id="gooey-m">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
-            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10" />
+          {/* 쫀득한 움직임을 위한 필터 */}
+          <filter id="goo">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" />
           </filter>
-          {/* 달의 금색 그라데이션 */}
-          <radialGradient id="moonGold" cx="30%" cy="30%" r="70%">
-            <stop offset="0%" stopColor="#FFFDF0" />
-            <stop offset="60%" stopColor="#E2C07D" />
-            <stop offset="100%" stopColor="#8A6A30" />
-          </radialGradient>
         </defs>
 
-        {/* 주기 바 & 젤리 셀렉터 영역 */}
-        <g filter="url(#gooey-m)">
+        {/* 주기 막대 가이드 (PA 데이터 기반) */}
+        <g opacity="0.3">
           {PA.map(pa => (
-            <path key={`bg-${pa.id}`} d={getRoundedPath(pa.s, pa.e, R, 8)} fill="rgba(255,255,255,0.05)" 
+            <path key={pa.id} d={getArcPath(pa.s, pa.e, R, 6)} fill="rgba(255,255,255,0.2)" 
                   onClick={() => onSelect(pa.id)} style={{ cursor: "pointer" }} />
           ))}
-          {activeArc && (
-            <path d={getRoundedPath(activeArc.s, activeArc.e, R, 11)} fill="rgba(255,255,255,0.25)"
-                  style={{ transition: "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)", pointerEvents: "none" }} />
-          )}
         </g>
 
-        {/* 오늘 위치 표시 (도트) */}
-        {todayPos && (
-          <circle cx={todayPos.x} cy={todayPos.y} r={5} fill="#fff" style={{ filter: "drop-shadow(0 0 8px white)" }} />
+        {/* 활성 영역 하이라이트 (영상처럼 부드럽게 미끄러짐) */}
+        {activeArc && (
+          <path 
+            d={getArcPath(activeArc.s, activeArc.e, R, 9)} 
+            fill="rgba(255,255,255,0.4)"
+            style={{ 
+              transition: "all 0.9s cubic-bezier(0.4, 0, 0.2, 1)",
+              filter: "drop-shadow(0 0 8px rgba(255,255,255,0.3))" 
+            }} 
+          />
         )}
 
-        {/* 중앙 달 렌더링 (위상 변화 적용) */}
-        <g transform={`translate(${cx-85}, ${cy-85})`}>
-          <circle cx="85" cy="85" r="60" fill="rgba(0,0,0,0.3)" />
-          <g transform="translate(-15, -15) scale(1.15)">
+        {/* 오늘 위치 도트 */}
+        {todayPos && (
+          <circle cx={todayPos.x} cy={todayPos.y} r={5} fill="#fff" style={{ filter: "drop-shadow(0 0 5px white)" }} />
+        )}
+
+        {/* 중앙 달 & 텍스트 */}
+        <g transform={`translate(${cx-100}, ${cy-100})`}>
+          <circle cx="100" cy="100" r="70" fill="transparent" />
+          <g transform="scale(0.8) translate(25, 25)">
             <defs>
-              <clipPath id="mClip"><path d={getMoonPath(mc.il, mc.wx, 60)} /></clipPath>
+              <clipPath id="mcp"><path d={getMoonPath(mc.il, mc.wx, 60)} /></clipPath>
             </defs>
-            <circle cx="100" cy="100" r="60" fill="#1a1a2e" />
-            <circle cx="100" cy="100" r="60" fill="url(#moonGold)" clipPath="url(#mClip)" 
-                    style={{ transition: "all 1s ease", filter: `drop-shadow(0 0 ${mc.il * 10}px #e2c07d)` }} />
+            <circle cx="100" cy="100" r="60" fill="rgba(255,255,255,0.05)" />
+            <circle cx="100" cy="100" r="60" fill="#E2C07D" clipPath="url(#mcp)" 
+                    style={{ transition: "all 1s ease", filter: "drop-shadow(0 0 10px #E2C07D)" }} />
           </g>
-          <text x="85" y="90" textAnchor="middle" fill="#fff" fontSize="15" fontWeight="300" letterSpacing="0.1em">
+          <text x="100" y="110" textAnchor="middle" fill="#fff" fontSize="16" fontWeight="300" style={{ letterSpacing: "0.1em" }}>
             {selPhase?.name}
           </text>
         </g>
-
-        {/* 하단 날짜 정보 */}
-        <text x={cx} y={cy+90} textAnchor="middle" fill="#fff" fontSize="13" opacity="0.6" fontWeight="200">
-          {new Date().getDate()}일
-        </text>
       </svg>
     </div>
   );
