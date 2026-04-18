@@ -209,6 +209,7 @@ const C={bg:"#07071e",card:"rgba(255,255,255,0.05)",text:"#ede8f5",muted:"#a8a8d
 
 function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
   const cx=160,cy=160,R=110;
+  const circ = 2 * Math.PI * R;
   const displayId=selId||todayId;
   const displayPhase=PHASES.find(p=>p.id===displayId);
   const MOON_CFG={wolsik:{il:0,wx:null},choseung:{il:0.2,wx:true},sanghyun:{il:0.5,wx:true},boreum:{il:1.0,wx:null},hahyun:{il:0.5,wx:false},geumeum:{il:0.2,wx:false}};
@@ -245,12 +246,44 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
           const p1=polar(cx,cy,R,pa.s+1.5),p2=polar(cx,cy,R,pa.e-1.5),large=(span-3)>180?1:0;
           return(
             <g key={pa.id}>
-              <path d={`M${p1.x} ${p1.y} A${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y}`} fill="none" stroke={ph.color} strokeWidth={isSel?22:16} strokeLinecap="round" opacity={isSel?0.9:isTod?0.7:0.35} style={{transition:"all 0.4s",cursor:"pointer",filter:isSel?`drop-shadow(0 0 8px ${ph.color})`:"none"}} onClick={()=>onSelect(pa.id)}/>
+              <path d={`M${p1.x} ${p1.y} A${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y}`} fill="none" stroke={ph.color} strokeWidth={isSel?22:16} strokeLinecap="round" opacity={isTod&&!selId?0.55:0.22} style={{transition:"all 0.4s",cursor:"pointer",filter:isSel?`drop-shadow(0 0 8px ${ph.color})`:"none"}} onClick={()=>onSelect(pa.id)}/>
               <path d={`M${p1.x} ${p1.y} A${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y}`} fill="none" stroke="transparent" strokeWidth="36" style={{cursor:"pointer"}} onClick={()=>onSelect(pa.id)}/>
             </g>
           );
         })}
         {angle!==null&&(
+          {(()=>{
+  const actPa=PA.find(pa=>pa.id===(selId||todayId));
+  if(!actPa) return null;
+  const ph=PHASES.find(p=>p.id===actPa.id);
+  const span=actPa.e-actPa.s;
+  const dLen=(span/360)*circ-8;
+  const rot=actPa.s-90;
+  return(
+    <>
+      {/* 색상 아크 */}
+      <circle cx={cx} cy={cy} r={R} fill="none"
+        stroke={ph.color} strokeWidth="22" strokeLinecap="round"
+        strokeDasharray={`${dLen} ${circ}`}
+        style={{transform:`rotate(${rot}deg)`,transformOrigin:`${cx}px ${cy}px`,
+          transition:"transform 0.65s cubic-bezier(0.34,1.56,0.64,1), stroke 0.35s",
+          filter:`drop-shadow(0 0 16px ${ph.color})`,opacity:0.88}}/>
+      {/* 유리 하이라이트 */}
+      <circle cx={cx} cy={cy} r={R} fill="none"
+        stroke="rgba(255,255,255,0.28)" strokeWidth="8" strokeLinecap="round"
+        strokeDasharray={`${dLen*0.28} ${circ}`}
+        style={{transform:`rotate(${rot+span*0.08}deg)`,transformOrigin:`${cx}px ${cy}px`,
+          transition:"transform 0.65s cubic-bezier(0.34,1.56,0.64,1)",opacity:0.7}}/>
+      {/* 엣지 글로우 */}
+      <circle cx={cx} cy={cy} r={R} fill="none"
+        stroke={ph.color} strokeWidth="30" strokeLinecap="round"
+        strokeDasharray={`3 ${circ}`}
+        style={{transform:`rotate(${rot+span*0.98}deg)`,transformOrigin:`${cx}px ${cy}px`,
+          transition:"transform 0.65s cubic-bezier(0.34,1.56,0.64,1)",opacity:0.5,filter:`blur(3px)`}}/>
+    </>
+  );
+})()}
+
           <g style={{transform:`rotate(${angle}deg)`,transformOrigin:`${cx}px ${cy}px`,transition:ready?"transform 1.5s cubic-bezier(0.34,1.56,0.64,1)":"none"}}>
             <line x1={cx} y1={cy} x2={cx} y2={cy-(R-10)} stroke={displayPhase?.color||"#aaa"} strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
             <line x1={cx} y1={cy} x2={cx} y2={cy-(R-10)} stroke="white" strokeWidth="0.6" strokeLinecap="round" opacity="0.2"/>
@@ -511,7 +544,7 @@ function Toggle({on,onChange}){return(<div onClick={()=>onChange(!on)} style={{w
               width:`calc(${W}% - 6px)`,
               borderRadius:12,
               background:sel.soft,
-              border:`1.5px solid ${sel.border}`,
+              border:`1.5px solid ${sel.color}22`, 
               backdropFilter:"blur(12px)",
               boxShadow:`0 0 16px ${sel.color}50, inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.25)`,
               transform:`scaleY(${scale}) scaleX(${0.96 + scale * 0.04})`,
