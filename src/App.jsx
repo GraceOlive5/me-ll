@@ -209,6 +209,7 @@ const C={bg:"#07071e",card:"rgba(255,255,255,0.05)",text:"#ede8f5",muted:"#a8a8d
 
 function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
   const cx=160,cy=160,R=110;
+  const rotRef = useRef(null);
   const circ = 2 * Math.PI * R;
   const displayId=selId||todayId;
   const displayPhase=PHASES.find(p=>p.id===displayId);
@@ -239,6 +240,8 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
           {PA.map(pa=><path key={pa.id} id={`tp-${pa.id}`} d={textArcPath(pa.s,pa.e)} fill="none"/>)}
           <clipPath id="mcp"><path d={getMoonPath(mc.il,mc.wx,40)}/></clipPath>
         </defs>
+        
+        
         <circle cx={cx} cy={cy} r={R} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="22"/>
         {PA.map(pa=>{
           const ph=PHASES.find(p=>p.id===pa.id);
@@ -257,7 +260,11 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
   const ph=PHASES.find(p=>p.id===actPa.id);
   const span=actPa.e-actPa.s;
   const dLen=(span/360)*circ-8;
-  const rot=actPa.s-90;
+  const rawRot=actPa.s-90;
+  if(rotRef.current===null) rotRef.current=rawRot;
+  const delta=((rawRot-rotRef.current)%360+360)%360;
+  rotRef.current=rotRef.current+delta;
+  const rot=rotRef.current;
   return(
     <>
       {/* 색상 아크 */}
@@ -298,8 +305,23 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
             </text>
           );
         })}
-        <circle cx={cx} cy={cy} r="40" fill="rgba(255,255,255,0.02)"/>
-        <circle cx={cx} cy={cy} r="40" fill="#E2C07D" clipPath="url(#mcp)" style={{transition:"all 1s ease",filter:"drop-shadow(0 0 12px rgba(226,192,125,0.6))"}}/>
+        <circle cx={cx} cy={cy} r="52" fill="none" stroke="#E2C07D" strokeWidth="12" style={{filter:"blur(14px)",opacity:0.35,transition:"all 1s ease"}} clipPath="url(#mcp)"/>
+        <circle cx={cx} cy={cy} r="44" fill="none" stroke="#fffbe8" strokeWidth="6" style={{filter:"blur(7px)",opacity:0.25,transition:"all 1s ease"}} clipPath="url(#mcp)"/>
+        <defs>
+          <radialGradient id="moonBase" cx="38%" cy="35%" r="65%"><stop offset="0%" stopColor="#fffdf0"/><stop offset="40%" stopColor="#e2c07d"/><stop offset="100%" stopColor="#7a5a20"/></radialGradient>
+          <radialGradient id="moonShad" cx="70%" cy="65%" r="60%"><stop offset="0%" stopColor="rgba(0,0,0,0)"/><stop offset="100%" stopColor="rgba(0,0,0,0.45)"/></radialGradient>
+          <radialGradient id="cr1" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="rgba(0,0,0,0.32)"/><stop offset="60%" stopColor="rgba(0,0,0,0.12)"/><stop offset="100%" stopColor="rgba(255,255,255,0.08)"/></radialGradient>
+          <radialGradient id="cr2" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="rgba(0,0,0,0.22)"/><stop offset="100%" stopColor="rgba(255,255,255,0.06)"/></radialGradient>
+        </defs>
+        <circle cx={cx} cy={cy} r="40" fill="url(#moonBase)" clipPath="url(#mcp)" style={{transition:"all 1s ease",filter:"drop-shadow(0 0 18px rgba(226,192,125,0.7))"}}/>
+        <circle cx={cx} cy={cy} r="40" fill="url(#moonShad)" clipPath="url(#mcp)" style={{transition:"all 1s ease"}}/>
+        <circle cx={cx-9} cy={cy-10} r="8" fill="url(#cr1)" clipPath="url(#mcp)" opacity="0.7"/>
+        <circle cx={cx+13} cy={cy+7} r="5.5" fill="url(#cr1)" clipPath="url(#mcp)" opacity="0.6"/>
+        <circle cx={cx-4} cy={cy+13} r="4" fill="url(#cr2)" clipPath="url(#mcp)" opacity="0.5"/>
+        <circle cx={cx+8} cy={cy-16} r="3" fill="url(#cr2)" clipPath="url(#mcp)" opacity="0.45"/>
+        <circle cx={cx-9} cy={cy-10} r="8" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="0.8" clipPath="url(#mcp)"/>
+        <circle cx={cx+13} cy={cy+7} r="5.5" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="0.7" clipPath="url(#mcp)"/>
+        <ellipse cx={cx-10} cy={cy-14} rx="14" ry="10" fill="rgba(255,255,255,0.08)" clipPath="url(#mcp)" style={{filter:"blur(4px)"}}/>
 
         {cycleDay!=null&&(
           <>
