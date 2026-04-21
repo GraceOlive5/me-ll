@@ -228,7 +228,7 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
   }
 
   function textArcPath(s,e){
-    const mid=(s+e)/2,isBottom=mid>90&&mid<260,pad=3,Rl=R+26;
+    const mid=(s+e)/2,isBottom=mid>90&&mid<260,pad=8,Rl=R;
     if(!isBottom){const p1=polar(cx,cy,Rl,s+pad),p2=polar(cx,cy,Rl,e-pad);return `M${p1.x} ${p1.y} A${Rl} ${Rl} 0 ${(e-s-pad*2)>180?1:0} 1 ${p2.x} ${p2.y}`;}
     else{const p1=polar(cx,cy,Rl,e-pad),p2=polar(cx,cy,Rl,s+pad);return `M${p1.x} ${p1.y} A${Rl} ${Rl} 0 ${(e-s-pad*2)>180?1:0} 0 ${p2.x} ${p2.y}`;}
   }
@@ -249,7 +249,8 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
           const p1=polar(cx,cy,R,pa.s+1.5),p2=polar(cx,cy,R,pa.e-1.5),large=(span-3)>180?1:0;
           return(
             <g key={pa.id}>
-              <path d={`M${p1.x} ${p1.y} A${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y}`} fill="none" stroke={ph.color} strokeWidth={isSel?22:16} strokeLinecap="round" opacity={isTod&&!selId?0.55:0.22} style={{transition:"all 0.4s",cursor:"pointer",filter:isSel?`drop-shadow(0 0 8px ${ph.color})`:"none"}} onClick={()=>onSelect(pa.id)}/>
+              <path d={`M${p1.x} ${p1.y} A${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y}`} fill="none" stroke={ph.color} strokeWidth={isSel?34:28} strokeLinecap="round"
+        opacity={isTod&&!selId?0.65:0.28} style={{transition:"all 0.4s",cursor:"pointer",filter:isSel?`drop-shadow(0 0 8px ${ph.color})`:"none"}} onClick={()=>onSelect(pa.id)}/>
               <path d={`M${p1.x} ${p1.y} A${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y}`} fill="none" stroke="transparent" strokeWidth="36" style={{cursor:"pointer"}} onClick={()=>onSelect(pa.id)}/>
             </g>
           );
@@ -300,8 +301,8 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
           const isSel=pa.id===selId,isTod=pa.id===todayId,span=pa.e-pa.s;
           const fs=span<42?"8.5":span<55?"9.5":"10.5";
           return(
-            <text key={pa.id} fontFamily="system-ui,sans-serif" fontSize={fs} fontWeight="600" fill={isSel||isTod?ph.color:"rgba(255,255,255,0.4)"} style={{cursor:"pointer",transition:"fill 0.3s"}} onClick={()=>onSelect(pa.id)}>
-              <textPath href={`#tp-${pa.id}`} startOffset="50%" textAnchor="middle">{ph.moon} {ph.name}</textPath>
+            <text key={pa.id} fontFamily="system-ui,sans-serif" fontSize={fs} fontWeight="600" fill={isSel||isTod?"rgba(255,255,255,0.95)":"rgba(255,255,255,0.55)"} style={{cursor:"pointer",transition:"fill 0.3s"}} onClick={()=>onSelect(pa.id)}>
+              <textPath href={`#tp-${pa.id}`} startOffset="50%" textAnchor="middle">{ph.name}</textPath>
             </text>
           );
         })}
@@ -383,7 +384,7 @@ function DdayRow({stats}){
   );
 }
 
-function CalView({periods,stats,setPeriods}){
+function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
   const[calMonth,setCalMonth]=useState(new Date());
   const[modal,setModal]=useState(null);
   const yr=calMonth.getFullYear(),mo=calMonth.getMonth();
@@ -429,11 +430,11 @@ function CalView({periods,stats,setPeriods}){
           if(inPeriod){bg=PHASES[0].soft;bdr=`1.5px solid ${PHASES[0].border}`;col=PHASES[0].text;}
           else if(isOvu){bg=PHASES[3].soft;bdr=`2px solid ${PHASES[3].color}`;col=PHASES[3].text;}
           else if(inFertile){bg="transparent";bdr=`1.5px dashed ${PHASES[3].color}`;col=PHASES[3].text;}
-          else if(ph){bg=ph.soft;col=ph.text;}
+          else if(ph){bg=`${ph.color}28`;bdr=`1px solid ${ph.color}50`;col=ph.text;}
           if(isToday)bdr="2px solid rgba(255,255,255,0.6)";
           return(
-            <div key={i} onClick={()=>handleDayTap(ds)} style={{aspectRatio:"1",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:7,background:bg,border:bdr,cursor:"pointer",WebkitTapHighlightColor:"transparent"}}>
-              <span style={{fontSize:11,fontWeight:isToday?700:400,color:col}}>{parseInt(ds.split("-")[2])}</span>
+            <div key={i} onClick={()=>handleDayTap(ds)} style={{aspectRatio:"1",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:7,background:bg,border:bdr,cursor:"pointer",WebkitTapHighlightColor:"transparent",position:"relative"}}>
+              <span style={{fontSize:11,fontWeight:isToday?700:400,color:col}}>{parseInt(ds.split("-")[2])}</span>               {loveRecords.includes(ds)&&<span style={{fontSize:7,lineHeight:1,position:"absolute",bottom:2,right:3}}>❤️</span>}
             </div>
           );
         })}
@@ -453,7 +454,12 @@ function CalView({periods,stats,setPeriods}){
         <div onClick={()=>setModal(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",display:"flex",alignItems:"flex-end",zIndex:100}}>
           <div onClick={e=>e.stopPropagation()} style={{width:"100%",background:"#14143a",borderRadius:"20px 20px 0 0",padding:"20px 20px 36px",boxShadow:"0 -4px 24px rgba(0,0,0,0.4)"}}>
             <div style={{textAlign:"center",marginBottom:16}}><div style={{fontSize:13,fontWeight:700,color:C.text}}>{fmtKo(modal.ds)} {modal.ds===today?"· 오늘":""}</div></div>
-            {modal.mode==="action"&&(<div style={{display:"grid",gap:10}}><button onClick={()=>addStart(modal.ds)} style={{padding:"15px",background:PHASES[0].soft,border:`1.5px solid ${PHASES[0].border}`,borderRadius:14,fontSize:14,fontWeight:700,color:PHASES[0].text,cursor:"pointer"}}>🌑 생리 시작일로 기록</button><button onClick={()=>addEnd(modal.ds)} style={{padding:"15px",background:C.card,border:`1.5px solid ${C.border}`,borderRadius:14,fontSize:14,fontWeight:600,color:C.text,cursor:"pointer"}}>✓ 생리 종료일로 기록</button><button onClick={()=>setModal(null)} style={{padding:"12px",background:"transparent",border:"none",fontSize:13,color:C.muted,cursor:"pointer"}}>취소</button></div>)}
+            {modal.mode==="action"&&(<div style={{display:"grid",gap:10}}>
+              <button onClick={()=>addStart(modal.ds)} style={{padding:"15px",background:PHASES[0].soft,border:`1.5px solid ${PHASES[0].border}`,borderRadius:14,fontSize:14,fontWeight:700,color:PHASES[0].text,cursor:"pointer"}}>🌑 생리 시작일로 기록</button>
+              <button onClick={()=>addEnd(modal.ds)} style={{padding:"15px",background:C.card,border:`1.5px solid ${C.border}`,borderRadius:14,fontSize:14,fontWeight:600,color:C.text,cursor:"pointer"}}>✓ 생리 종료일로 기록</button>
+              <button onClick={()=>{setLoveRecords(prev=>prev.includes(modal.ds)?prev.filter(d=>d!==modal.ds):[...prev,modal.ds]);setModal(null);}} style={{padding:"15px",background:"rgba(255,100,120,0.12)",border:"1.5px solid rgba(255,100,120,0.3)",borderRadius:14,fontSize:14,fontWeight:600,color:"#ff8099",cursor:"pointer"}}>{loveRecords.includes(modal.ds)?"💔 사랑 기록 삭제":"❤️ 사랑 기록 추가"}</button>
+              <button onClick={()=>setModal(null)} style={{padding:"12px",background:"transparent",border:"none",fontSize:13,color:C.muted,cursor:"pointer"}}>취소</button>
+            </div>)}
             {modal.mode==="edit"&&(<div style={{display:"grid",gap:10}}><div style={{padding:"12px 14px",background:"rgba(212,160,80,0.1)",borderRadius:12,fontSize:12,color:PHASES[3].text,lineHeight:1.6}}><strong>종료일 근처 기록이 있어요</strong><br/>{fmtKo(modal.period.start)}{modal.period.end?` ~ ${fmtKo(modal.period.end)}`:" (종료일 미입력)"}</div><button onClick={()=>editEnd(modal.period.id,modal.ds)} style={{padding:"14px",background:PHASES[0].soft,border:`1.5px solid ${PHASES[0].border}`,borderRadius:14,fontSize:14,fontWeight:700,color:PHASES[0].text,cursor:"pointer"}}>✓ 종료일을 {fmtKo(modal.ds)}로 수정</button><button onClick={()=>setModal({...modal,mode:"action"})} style={{padding:"14px",background:C.card,border:`1.5px solid ${C.border}`,borderRadius:14,fontSize:13,fontWeight:600,color:C.muted,cursor:"pointer"}}>+ 새 기록으로 추가</button><button onClick={()=>setModal(null)} style={{padding:"12px",background:"transparent",border:"none",fontSize:13,color:C.muted,cursor:"pointer"}}>취소</button></div>)}
             {modal.mode==="menu"&&(<div style={{display:"grid",gap:10}}><div style={{padding:"12px 14px",background:PHASES[0].soft,borderRadius:12,fontSize:12,color:PHASES[0].text}}>기록된 생리: {fmtKo(modal.period.start)}{modal.period.end?` ~ ${fmtKo(modal.period.end)}`:" (종료일 없음)"}</div><button onClick={()=>editEnd(modal.period.id,modal.ds)} style={{padding:"14px",background:C.card,border:`1.5px solid ${C.border}`,borderRadius:14,fontSize:14,fontWeight:600,color:C.text,cursor:"pointer"}}>✓ 종료일을 {fmtKo(modal.ds)}로 변경</button><button onClick={()=>deletePeriod(modal.period.id)} style={{padding:"14px",background:"rgba(239,68,68,0.1)",border:"1.5px solid rgba(239,68,68,0.3)",borderRadius:14,fontSize:14,fontWeight:600,color:"#f87171",cursor:"pointer"}}>🗑 이 기록 삭제</button><button onClick={()=>setModal(null)} style={{padding:"12px",background:"transparent",border:"none",fontSize:13,color:C.muted,cursor:"pointer"}}>취소</button></div>)}
           </div>
@@ -634,11 +640,20 @@ function Toggle({on,onChange}){return(<div onClick={()=>onChange(!on)} style={{w
  
 function MyPage({stats,periods,user}){
   const[prefs,setPrefs]=useState(loadNotifPrefs);
+  const [editingKey,setEditingKey]=useState(null);
+const [customMsgs,setCustomMsgs]=useState(()=>{try{return JSON.parse(localStorage.getItem("notif-msgs-v1")||"{}");}catch{return {};}});
+function saveMsg(key,val){const next={...customMsgs,[key]:val.slice(0,20)};setCustomMsgs(next);localStorage.setItem("notif-msgs-v1",JSON.stringify(next));}
   const[notifPerm,setNotifPerm]=useState(typeof Notification!=="undefined"?Notification.permission:"unsupported");
   useEffect(()=>{try{localStorage.setItem(NOTIF_KEY,JSON.stringify(prefs));}catch{}},[prefs]);
   function set(key,val){setPrefs(p=>({...p,[key]:val}));}
-  const NOTIF_ITEMS=[{key:"period3",label:"생리 예정 D-3",desc:"생리 3일 전 미리 알림"},{key:"period1",label:"생리 예정 D-1",desc:"생리 하루 전 알림"},{key:"fertile",label:"가임기 시작",desc:"가임기 첫날 알림"},{key:"ovulation",label:"배란 예정일",desc:"배란 예상 당일 알림"},{key:"phaseChange",label:"위상 변경",desc:"새 달 위상 시작일 알림"},{key:"dailyTip",label:"오늘의 팁",desc:"현재 위상 맞춤 조언"}];
-  return(
+  const NOTIF_ITEMS=[
+    {key:"period3",label:"생리 예정 D-3",desc:"생리 3일 전 미리 알림",defaultMsg:"D-3입니다."},
+    {key:"period1",label:"생리 예정 D-1",desc:"생리 하루 전 알림",defaultMsg:"내일 생리 예정이에요."},
+    {key:"fertile",label:"가임기 시작",desc:"가임기 첫날 알림",defaultMsg:"오늘부터 가임기예요."},
+    {key:"ovulation",label:"배란 예정일",desc:"배란 예상 당일 알림",defaultMsg:"오늘 배란 예정일이에요."},
+    {key:"phaseChange",label:"위상 변경",desc:"새 달 위상 시작일 알림",defaultMsg:"새 위상이 시작됐어요."},
+    {key:"dailyTip",label:"오늘의 팁",desc:"현재 위상 맞춤 조언",defaultMsg:"오늘의 팁을 확인하세요."},
+  ];
     <div>
       {user&&(
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:"14px 16px",marginBottom:20,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -674,9 +689,29 @@ function MyPage({stats,periods,user}){
           </select>
         </div>
         {NOTIF_ITEMS.map((item,i)=>(
-          <div key={item.key} style={{padding:"13px 16px",borderBottom:i<NOTIF_ITEMS.length-1?`1px solid ${C.border}`:"none",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
-            <div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:C.text,marginBottom:1}}>{item.label}</div><div style={{fontSize:11,color:C.muted}}>{item.desc}</div></div>
-            <Toggle on={prefs[item.key]} onChange={v=>set(item.key,v)}/>
+          <div key={item.key} style={{borderBottom:i<NOTIF_ITEMS.length-1?`1px solid ${C.border}`:"none"}}>
+            <div style={{padding:"13px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
+              <div style={{flex:1}}>
+                <div style={{fontSize:13,fontWeight:600,color:C.text,marginBottom:1}}>{item.label}</div>
+                <div style={{display:"flex",alignItems:"center",gap:5,marginTop:3}}>
+                  <span style={{fontSize:11,color:C.muted}}>{customMsgs[item.key]||item.defaultMsg}</span>
+                  <button onClick={()=>setEditingKey(editingKey===item.key?null:item.key)} style={{background:"none",border:"none",color:C.muted,fontSize:11,padding:"1px 4px",cursor:"pointer",opacity:0.6}}>✏️</button>
+                </div>
+              </div>
+              <Toggle on={prefs[item.key]} onChange={v=>set(item.key,v)}/>
+            </div>
+            {editingKey===item.key&&(
+              <div style={{padding:"0 16px 12px",display:"flex",gap:8,alignItems:"center"}}>
+                <input
+                  defaultValue={customMsgs[item.key]||item.defaultMsg}
+                  maxLength={20}
+                  onKeyDown={e=>{if(e.key==="Enter"){saveMsg(item.key,e.target.value);setEditingKey(null);}}}
+                  style={{flex:1,background:"rgba(255,255,255,0.07)",border:`1px solid ${C.border}`,borderRadius:8,color:C.text,padding:"7px 10px",fontSize:12,outline:"none",fontFamily:"system-ui"}}
+                  placeholder="최대 20자"
+                />
+                <button onClick={e=>{saveMsg(item.key,e.target.previousSibling.value);setEditingKey(null);}} style={{padding:"7px 12px",background:"rgba(152,152,204,0.2)",border:`1px solid ${PHASES[0].border}`,borderRadius:8,color:C.text,fontSize:11,fontWeight:700}}>저장</button>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -745,6 +780,7 @@ export default function App(){
   const[tab,setTab]=useState("dash");
   const[sec,setSec]=useState("tips");
   const[selId,setSelId]=useState(null);
+  const [loveRecords, setLoveRecords] = useState([]);
   const[ready,setReady]=useState(false);
 
   useEffect(()=>{const unsub=onAuthStateChanged(auth,u=>setUser(u??null));return unsub;},[]);
@@ -752,12 +788,15 @@ export default function App(){
   useEffect(()=>{
     if(!user){setLoaded(false);setPeriods([]);return;}
     (async()=>{
-      try{const snap=await getDoc(doc(db,"users",user.uid));if(snap.exists()){const d=snap.data().periods;if(Array.isArray(d))setPeriods(d);}}catch(e){console.error(e);}
+      try{const snap=await getDoc(doc(db,"users",user.uid));if(snap.exists()){
+  const d=snap.data().periods; if(Array.isArray(d))setPeriods(d);
+  const lr=snap.data().loveRecords; if(Array.isArray(lr))setLoveRecords(lr);
+}}catch(e){console.error(e);}
       setLoaded(true);setTimeout(()=>setReady(true),400);
     })();
   },[user]);
 
-  useEffect(()=>{if(!user||!loaded)return;setDoc(doc(db,"users",user.uid),{periods},{merge:true}).catch(console.error);},[periods,loaded,user]);
+  useEffect(()=>{if(!user||!loaded)return;setDoc(doc(db,"users",user.uid),{periods,loveRecords},{merge:true}).catch(console.error);},[periods,loveRecords,loaded,user]);
 
   const stats=computeStats(periods);
   const isToday=selId===null;
@@ -883,7 +922,7 @@ export default function App(){
             </>
           )
         )}
-        {tab==="cal"&&<CalView periods={periods} stats={stats} setPeriods={setPeriods}/>}
+        {tab==="cal"&&<CalView periods={periods} stats={stats} setPeriods={setPeriods} loveRecords={loveRecords} setLoveRecords={setLoveRecords}/>}
         {tab==="record"&&<RecordView periods={periods} setPeriods={setPeriods}/>}
         {tab==="my"&&<MyPage stats={stats} periods={periods} user={user}/>}
       </div>
