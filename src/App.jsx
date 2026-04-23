@@ -105,36 +105,25 @@ const PHASE_SEASON_FOODS = {
   geumeum:{spring:["시금치·달래 — 마그네슘+칼륨 (PMS 완화)","딸기 — 비타민C+항산화","두릅·미나리 — 비타민B+해독","바나나 — 칼륨+트립토판 (붓기 완화)"],summer:["깻잎·수박 — 마그네슘+칼륨 (붓기 완화)","옥수수 — 복합탄수화물+칼륨","낙지 — 마그네슘+타우린","복숭아 — 칼륨+수분"],autumn:["고구마·감 — 칼륨 (붓기·수분 저류 완화)","굴 — 마그네슘+칼슘+아연 (PMS 3중 지원)","사과 — 비타민C+항산화","단호박 — 베타카로틴+칼슘"],winter:["시금치·우엉 — 마그네슘+철분","굴 — 칼슘+마그네슘+아연 (PMS 3중 지원)","귤·한라봉 — 비타민C","고구마 — 칼륨+복합탄수화물"]},
 };
 
-function getPhaseSeasonalFoods(phaseId) {
-  const m = new Date().getMonth() + 1;
-  const sk = m>=3&&m<=5?"spring":m>=6&&m<=8?"summer":m>=9&&m<=11?"autumn":"winter";
-  return PHASE_SEASON_FOODS[phaseId]?.[sk] || [];
-}
+function getPhaseSeasonalFoods(phaseId){const m=new Date().getMonth()+1;const sk=m>=3&&m<=5?"spring":m>=6&&m<=8?"summer":m>=9&&m<=11?"autumn":"winter";return PHASE_SEASON_FOODS[phaseId]?.[sk]||[];}
 
-const SEASONS = {
-  spring:      { name:"봄",    emoji:"🌸", color:"#4a9e68", soft:"rgba(74,158,104,0.12)",  border:"rgba(74,158,104,0.25)",  exerciseTip:"봄은 야외 활동 시작하기 딱 좋은 계절이에요. 꽃가루 알레르기가 있다면 마스크 착용을 권해요.", exerciseBonus:["공원 달리기·조깅 — 일교차 있으니 얇은 겉옷 챙기기","자전거 라이딩 — 벚꽃 시즌엔 기분까지 좋아져요","등산 — 봄 산행은 진달래·철쭉 감상하며 유산소","야외 요가·스트레칭 — 잔디밭에서 몸풀기"] },
-  summer_early:{ name:"장마철", emoji:"🌧️", color:"#5b7fa6", soft:"rgba(91,127,166,0.12)", border:"rgba(91,127,166,0.25)", exerciseTip:"장마철엔 야외 운동이 어렵고 습도가 높아 컨디션 관리가 중요해요. 실내 운동으로 루틴을 유지하세요.", exerciseBonus:["실내 수영 — 습도·더위 상관없이 전신 유산소","헬스장 HIIT — 에어컨 아래서 강도 높게","홈트레이닝 — 비 오는 날 집에서","필라테스·요가 스튜디오 — 비 맞지 않고 운동 가능"] },
-  summer_late: { name:"한여름", emoji:"☀️", color:"#d4a050", soft:"rgba(212,160,80,0.12)",  border:"rgba(212,160,80,0.25)", exerciseTip:"폭염 시 낮 12-4시 야외 운동은 피하세요. 이른 아침(6-8시)이나 저녁(7-9시)을 활용하거나 실내로 이동하세요.", exerciseBonus:["이른 아침 달리기 — 해뜨기 전후 30분이 베스트","수영 — 폭염에도 체온 조절하며 전신 운동","야간 자전거 — 더위 식은 저녁 활용","실내 볼링·배드민턴 — 가볍게 즐기는 실내 스포츠"] },
-  autumn:      { name:"가을",  emoji:"🍂", color:"#c08060", soft:"rgba(192,128,96,0.12)",  border:"rgba(192,128,96,0.25)", exerciseTip:"가을은 야외 운동 최적의 계절이에요. 일교차가 크니 워밍업을 충분히 하고, 오후 3-5시가 운동하기 가장 좋아요.", exerciseBonus:["등산·트레킹 — 단풍 시즌, 전신 유산소+하체 강화","마라톤·10km 대회 — 가을 레이스 시즌 도전해보세요","야외 사이클링 — 선선한 바람에 라이딩","테니스·배드민턴 — 야외 코트에서 즐기기"] },
-  winter:      { name:"겨울",  emoji:"❄️", color:"#9898cc", soft:"rgba(152,152,204,0.12)", border:"rgba(152,152,204,0.25)", exerciseTip:"겨울엔 근육이 굳기 쉬워 부상 위험이 높아요. 준비운동을 평소보다 2배 길게 하고, 실내 운동 비중을 늘리세요.", exerciseBonus:["실내 수영·아쿠아로빅 — 추위 상관없이 전신 운동","헬스장 웨이트 — 추운 날 실내에서 근력 집중","스키·스노보드 — 겨울 시즌 스포츠 도전","핫요가 — 따뜻하게 몸 풀면서 유연성 향상"] },
+const SEASONS={
+  spring:{name:"봄",emoji:"🌸",color:"#4a9e68",soft:"rgba(74,158,104,0.12)",border:"rgba(74,158,104,0.25)",exerciseTip:"봄은 야외 활동 시작하기 딱 좋은 계절이에요. 꽃가루 알레르기가 있다면 마스크 착용을 권해요.",exerciseBonus:["공원 달리기·조깅 — 일교차 있으니 얇은 겉옷 챙기기","자전거 라이딩 — 벚꽃 시즌엔 기분까지 좋아져요","등산 — 봄 산행은 진달래·철쭉 감상하며 유산소","야외 요가·스트레칭 — 잔디밭에서 몸풀기"]},
+  summer_early:{name:"장마철",emoji:"🌧️",color:"#5b7fa6",soft:"rgba(91,127,166,0.12)",border:"rgba(91,127,166,0.25)",exerciseTip:"장마철엔 야외 운동이 어렵고 습도가 높아 컨디션 관리가 중요해요. 실내 운동으로 루틴을 유지하세요.",exerciseBonus:["실내 수영 — 습도·더위 상관없이 전신 유산소","헬스장 HIIT — 에어컨 아래서 강도 높게","홈트레이닝 — 비 오는 날 집에서","필라테스·요가 스튜디오 — 비 맞지 않고 운동 가능"]},
+  summer_late:{name:"한여름",emoji:"☀️",color:"#d4a050",soft:"rgba(212,160,80,0.12)",border:"rgba(212,160,80,0.25)",exerciseTip:"폭염 시 낮 12-4시 야외 운동은 피하세요. 이른 아침(6-8시)이나 저녁(7-9시)을 활용하거나 실내로 이동하세요.",exerciseBonus:["이른 아침 달리기 — 해뜨기 전후 30분이 베스트","수영 — 폭염에도 체온 조절하며 전신 운동","야간 자전거 — 더위 식은 저녁 활용","실내 볼링·배드민턴 — 가볍게 즐기는 실내 스포츠"]},
+  autumn:{name:"가을",emoji:"🍂",color:"#c08060",soft:"rgba(192,128,96,0.12)",border:"rgba(192,128,96,0.25)",exerciseTip:"가을은 야외 운동 최적의 계절이에요. 일교차가 크니 워밍업을 충분히 하고, 오후 3-5시가 운동하기 가장 좋아요.",exerciseBonus:["등산·트레킹 — 단풍 시즌, 전신 유산소+하체 강화","마라톤·10km 대회 — 가을 레이스 시즌 도전해보세요","야외 사이클링 — 선선한 바람에 라이딩","테니스·배드민턴 — 야외 코트에서 즐기기"]},
+  winter:{name:"겨울",emoji:"❄️",color:"#9898cc",soft:"rgba(152,152,204,0.12)",border:"rgba(152,152,204,0.25)",exerciseTip:"겨울엔 근육이 굳기 쉬워 부상 위험이 높아요. 준비운동을 평소보다 2배 길게 하고, 실내 운동 비중을 늘리세요.",exerciseBonus:["실내 수영·아쿠아로빅 — 추위 상관없이 전신 운동","헬스장 웨이트 — 추운 날 실내에서 근력 집중","스키·스노보드 — 겨울 시즌 스포츠 도전","핫요가 — 따뜻하게 몸 풀면서 유연성 향상"]},
 };
 
-function getActualSeason() {
-  const m = new Date().getMonth() + 1;
-  if (m>=3&&m<=5) return SEASONS.spring;
-  if (m===6||m===7) return SEASONS.summer_early;
-  if (m===8) return SEASONS.summer_late;
-  if (m>=9&&m<=11) return SEASONS.autumn;
-  return SEASONS.winter;
-}
+function getActualSeason(){const m=new Date().getMonth()+1;if(m>=3&&m<=5)return SEASONS.spring;if(m===6||m===7)return SEASONS.summer_early;if(m===8)return SEASONS.summer_late;if(m>=9&&m<=11)return SEASONS.autumn;return SEASONS.winter;}
 
-const PA = [
-  { id:"choseung", s:0,            e:(4/28)*360  },
-  { id:"sanghyun", s:(4/28)*360,   e:(8/28)*360  },
-  { id:"boreum",   s:(8/28)*360,   e:(11/28)*360 },
-  { id:"hahyun",   s:(11/28)*360,  e:(18/28)*360 },
-  { id:"geumeum",  s:(18/28)*360,  e:(23/28)*360 },
-  { id:"wolsik",   s:(23/28)*360,  e:360         },
+const PA=[
+  {id:"choseung",s:0,e:(4/28)*360},
+  {id:"sanghyun",s:(4/28)*360,e:(8/28)*360},
+  {id:"boreum",s:(8/28)*360,e:(11/28)*360},
+  {id:"hahyun",s:(11/28)*360,e:(18/28)*360},
+  {id:"geumeum",s:(18/28)*360,e:(23/28)*360},
+  {id:"wolsik",s:(23/28)*360,e:360},
 ];
 
 function polar(cx,cy,r,deg){const rad=((deg-90)*Math.PI)/180;return{x:cx+r*Math.cos(rad),y:cy+r*Math.sin(rad)};}
@@ -146,28 +135,28 @@ function shiftDays(str,n){const d=toDate(str);d.setDate(d.getDate()+n);return to
 function fmtKo(str){const d=toDate(str);return `${d.getMonth()+1}월 ${d.getDate()}일`;}
 
 function phaseFromDay(day){
-  if(day<=5) return PHASES[0];
-  if(day<=9) return PHASES[1];
-  if(day<=13) return PHASES[2];
-  if(day<=16) return PHASES[3];
-  if(day<=23) return PHASES[4];
+  if(day<=5)return PHASES[0];
+  if(day<=9)return PHASES[1];
+  if(day<=13)return PHASES[2];
+  if(day<=16)return PHASES[3];
+  if(day<=23)return PHASES[4];
   return PHASES[5];
 }
 
 function computeStats(periods){
-  if(!periods||periods.length===0) return null;
+  if(!periods||periods.length===0)return null;
   try{
     const sorted=[...periods].filter(p=>p&&p.start).sort((a,b)=>toDate(b.start)-toDate(a.start));
-    if(!sorted.length) return null;
+    if(!sorted.length)return null;
     const today=todayStr();
     const recentPast=sorted.find(p=>daysBetween(p.start,today)>=0);
-    if(!recentPast) return null;
+    if(!recentPast)return null;
     const daysSince=daysBetween(recentPast.start,today)+1;
     let avgCycle=28;
     if(sorted.length>=2){
       const gaps=[];
       for(let i=0;i<sorted.length-1;i++){const g=daysBetween(sorted[i+1].start,sorted[i].start);if(g>=21&&g<=45)gaps.push(g);}
-      if(gaps.length) avgCycle=Math.round(gaps.reduce((a,b)=>a+b,0)/gaps.length);
+      if(gaps.length)avgCycle=Math.round(gaps.reduce((a,b)=>a+b,0)/gaps.length);
     }
     const durs=sorted.filter(p=>p.end).map(p=>daysBetween(p.start,p.end)+1);
     const avgDuration=durs.length?Math.round(durs.reduce((a,b)=>a+b,0)/durs.length):5;
@@ -209,18 +198,18 @@ const C={bg:"#07071e",card:"rgba(255,255,255,0.05)",text:"#ede8f5",muted:"#a8a8d
 
 function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
   const cx=160,cy=160,R=110;
-  const rotRef = useRef(null);
-  const circ = 2 * Math.PI * R;
+  const rotRef=useRef(null);
+  const circ=2*Math.PI*R;
   const displayId=selId||todayId;
   const displayPhase=PHASES.find(p=>p.id===displayId);
   const MOON_CFG={wolsik:{il:0,wx:null},choseung:{il:0.2,wx:true},sanghyun:{il:0.5,wx:true},boreum:{il:1.0,wx:null},hahyun:{il:0.5,wx:false},geumeum:{il:0.2,wx:false}};
   const mc=MOON_CFG[displayId]||MOON_CFG.wolsik;
+
   function getMoonPath(il,wx,r){
     if(wx===null){
-  if(il===0) return `M0,0 L0,0`; // 월식: 완전 어둠
-  return `M${cx-r},${cy} a${r},${r} 0 1,0 ${r*2},0 a${r},${r} 0 1,0 -${r*2},0`;
-}
-
+      if(il===0)return "M0,0 L0,0";
+      return `M${cx-r},${cy} a${r},${r} 0 1,0 ${r*2},0 a${r},${r} 0 1,0 -${r*2},0`;
+    }
     const rx=r*Math.abs(1-2*il);
     const sw=il<=0.5?(wx?0:1):(wx?1:0);
     return wx?`M${cx},${cy-r} A${r},${r} 0 0 1 ${cx},${cy+r} A${rx},${r} 0 0 ${sw} ${cx},${cy-r}`
@@ -232,6 +221,7 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
     if(!isBottom){const p1=polar(cx,cy,Rl,s+pad),p2=polar(cx,cy,Rl,e-pad);return `M${p1.x} ${p1.y} A${Rl} ${Rl} 0 ${(e-s-pad*2)>180?1:0} 1 ${p2.x} ${p2.y}`;}
     else{const p1=polar(cx,cy,Rl,e-pad),p2=polar(cx,cy,Rl,s+pad);return `M${p1.x} ${p1.y} A${Rl} ${Rl} 0 ${(e-s-pad*2)>180?1:0} 0 ${p2.x} ${p2.y}`;}
   }
+
   return(
     <div style={{position:"relative",width:320,height:320,margin:"0 auto"}}>
       <div style={{position:"absolute",inset:10,borderRadius:"50%",background:"rgba(15,15,50,0.6)",border:"1px solid rgba(255,255,255,0.08)",zIndex:0}}/>
@@ -239,10 +229,14 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
         <defs>
           {PA.map(pa=><path key={pa.id} id={`tp-${pa.id}`} d={textArcPath(pa.s,pa.e)} fill="none"/>)}
           <clipPath id="mcp"><path d={getMoonPath(mc.il,mc.wx,40)}/></clipPath>
+          <radialGradient id="moonBase" cx="38%" cy="35%" r="65%"><stop offset="0%" stopColor="#fffdf0"/><stop offset="40%" stopColor="#e2c07d"/><stop offset="100%" stopColor="#7a5a20"/></radialGradient>
+          <radialGradient id="moonShad" cx="70%" cy="65%" r="60%"><stop offset="0%" stopColor="rgba(0,0,0,0)"/><stop offset="100%" stopColor="rgba(0,0,0,0.45)"/></radialGradient>
+          <radialGradient id="cr1" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="rgba(0,0,0,0.32)"/><stop offset="60%" stopColor="rgba(0,0,0,0.12)"/><stop offset="100%" stopColor="rgba(255,255,255,0.08)"/></radialGradient>
+          <radialGradient id="cr2" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="rgba(0,0,0,0.22)"/><stop offset="100%" stopColor="rgba(255,255,255,0.06)"/></radialGradient>
         </defs>
-        
-        
-        <circle cx={cx} cy={cy} r={R} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="22"/>
+
+        <circle cx={cx} cy={cy} r={R} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="34"/>
+
         {PA.map(pa=>{
           const ph=PHASES.find(p=>p.id===pa.id);
           const isSel=pa.id===selId,isTod=pa.id===todayId,span=pa.e-pa.s;
@@ -250,70 +244,64 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
           return(
             <g key={pa.id}>
               <path d={`M${p1.x} ${p1.y} A${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y}`} fill="none" stroke={ph.color} strokeWidth={isSel?34:28} strokeLinecap="round"
-        opacity={isTod&&!selId?0.65:0.28} style={{transition:"all 0.4s",cursor:"pointer",filter:isSel?`drop-shadow(0 0 8px ${ph.color})`:"none"}} onClick={()=>onSelect(pa.id)}/>
-              <path d={`M${p1.x} ${p1.y} A${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y}`} fill="none" stroke="transparent" strokeWidth="36" style={{cursor:"pointer"}} onClick={()=>onSelect(pa.id)}/>
+                opacity={isTod&&!selId?0.65:0.28} style={{transition:"all 0.4s",cursor:"pointer",filter:isSel?`drop-shadow(0 0 8px ${ph.color})`:"none"}} onClick={()=>onSelect(pa.id)}/>
+              <path d={`M${p1.x} ${p1.y} A${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y}`} fill="none" stroke="transparent" strokeWidth="40" style={{cursor:"pointer"}} onClick={()=>onSelect(pa.id)}/>
             </g>
           );
         })}
-          {(()=>{
-  const actPa=PA.find(pa=>pa.id===(selId||todayId));
-  if(!actPa) return null;
-  const ph=PHASES.find(p=>p.id===actPa.id);
-  const span=actPa.e-actPa.s;
-  const dLen=(span/360)*circ-8;
-  const rawRot=actPa.s-90;
-  if(rotRef.current===null) rotRef.current=rawRot;
-  const delta=((rawRot-rotRef.current)%360+360)%360;
-  rotRef.current=rotRef.current+delta;
-  const rot=rotRef.current;
-  return(
-    <>
-      {/* 색상 아크 */}
-      <circle cx={cx} cy={cy} r={R} fill="none"
-        stroke={ph.color} strokeWidth="22" strokeLinecap="round"
-        strokeDasharray={`${dLen} ${circ}`}
-        style={{transform:`rotate(${rot}deg)`,transformOrigin:`${cx}px ${cy}px`,
-          transition:"transform 0.65s cubic-bezier(0.34,1.56,0.64,1), stroke 0.35s",
-          filter:`drop-shadow(0 0 16px ${ph.color})`,opacity:0.88}}/>
-      {/* 유리 하이라이트 */}
-      <circle cx={cx} cy={cy} r={R} fill="none"
-        stroke="rgba(255,255,255,0.28)" strokeWidth="8" strokeLinecap="round"
-        strokeDasharray={`${dLen*0.28} ${circ}`}
-        style={{transform:`rotate(${rot+span*0.08}deg)`,transformOrigin:`${cx}px ${cy}px`,
-          transition:"transform 0.65s cubic-bezier(0.34,1.56,0.64,1)",opacity:0.7}}/>
-      {/* 엣지 글로우 */}
-      <circle cx={cx} cy={cy} r={R} fill="none"
-        stroke={ph.color} strokeWidth="30" strokeLinecap="round"
-        strokeDasharray={`3 ${circ}`}
-        style={{transform:`rotate(${rot+span*0.98}deg)`,transformOrigin:`${cx}px ${cy}px`,
-          transition:"transform 0.65s cubic-bezier(0.34,1.56,0.64,1)",opacity:0.5,filter:`blur(3px)`}}/>
-    </>
-  );
-})()}
-{angle!==null&&(
+
+        {(()=>{
+          const actPa=PA.find(pa=>pa.id===(selId||todayId));
+          if(!actPa)return null;
+          const ph=PHASES.find(p=>p.id===actPa.id);
+          const span=actPa.e-actPa.s;
+          const dLen=(span/360)*circ-8;
+          const rawRot=actPa.s-90;
+          if(rotRef.current===null)rotRef.current=rawRot;
+          const delta=((rawRot-rotRef.current)%360+360)%360;
+          rotRef.current=rotRef.current+delta;
+          const rot=rotRef.current;
+          return(
+            <>
+              <circle cx={cx} cy={cy} r={R} fill="none" stroke={ph.color} strokeWidth="22" strokeLinecap="round"
+                strokeDasharray={`${dLen} ${circ}`}
+                style={{transform:`rotate(${rot}deg)`,transformOrigin:`${cx}px ${cy}px`,
+                  transition:"transform 0.65s cubic-bezier(0.34,1.56,0.64,1), stroke 0.35s",
+                  filter:`drop-shadow(0 0 16px ${ph.color})`,opacity:0.88}}/>
+              <circle cx={cx} cy={cy} r={R} fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="8" strokeLinecap="round"
+                strokeDasharray={`${dLen*0.28} ${circ}`}
+                style={{transform:`rotate(${rot+span*0.08}deg)`,transformOrigin:`${cx}px ${cy}px`,
+                  transition:"transform 0.65s cubic-bezier(0.34,1.56,0.64,1)",opacity:0.7}}/>
+              <circle cx={cx} cy={cy} r={R} fill="none" stroke={ph.color} strokeWidth="30" strokeLinecap="round"
+                strokeDasharray={`3 ${circ}`}
+                style={{transform:`rotate(${rot+span*0.98}deg)`,transformOrigin:`${cx}px ${cy}px`,
+                  transition:"transform 0.65s cubic-bezier(0.34,1.56,0.64,1)",opacity:0.5,filter:"blur(3px)"}}/>
+            </>
+          );
+        })()}
+
+        {angle!==null&&(
           <g style={{transform:`rotate(${angle}deg)`,transformOrigin:`${cx}px ${cy}px`,transition:ready?"transform 1.5s cubic-bezier(0.34,1.56,0.64,1)":"none"}}>
             <line x1={cx} y1={cy} x2={cx} y2={cy-(R-10)} stroke={displayPhase?.color||"#aaa"} strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
             <line x1={cx} y1={cy} x2={cx} y2={cy-(R-10)} stroke="white" strokeWidth="0.6" strokeLinecap="round" opacity="0.2"/>
           </g>
         )}
+
         {PA.map(pa=>{
           const ph=PHASES.find(p=>p.id===pa.id);
           const isSel=pa.id===selId,isTod=pa.id===todayId,span=pa.e-pa.s;
-          const fs=span<42?"8.5":span<55?"9.5":"10.5";
+          const fs=span<42?"8":span<55?"9":span<90?"9.5":"10";
           return(
-            <text key={pa.id} fontFamily="system-ui,sans-serif" fontSize={fs} fontWeight="600" fill={isSel||isTod?"rgba(255,255,255,0.95)":"rgba(255,255,255,0.55)"} style={{cursor:"pointer",transition:"fill 0.3s"}} onClick={()=>onSelect(pa.id)}>
-              <textPath href={`#tp-${pa.id}`} startOffset="50%" textAnchor="middle">{ph.name}</textPath>
+            <text key={pa.id} fontFamily="system-ui,sans-serif" fontSize={fs} fontWeight="600"
+              fill={isSel||isTod?"#ffffff":"rgba(255,255,255,0.75)"}
+              style={{cursor:"pointer",transition:"fill 0.3s"}} onClick={()=>onSelect(pa.id)}>
+              <textPath href={`#tp-${pa.id}`} startOffset="50%" textAnchor="middle">{ph.name} {ph.season}</textPath>
             </text>
           );
         })}
+
         <circle cx={cx} cy={cy} r="52" fill="none" stroke="#E2C07D" strokeWidth="12" style={{filter:"blur(14px)",opacity:0.35,transition:"all 1s ease"}} clipPath="url(#mcp)"/>
         <circle cx={cx} cy={cy} r="44" fill="none" stroke="#fffbe8" strokeWidth="6" style={{filter:"blur(7px)",opacity:0.25,transition:"all 1s ease"}} clipPath="url(#mcp)"/>
-        <defs>
-          <radialGradient id="moonBase" cx="38%" cy="35%" r="65%"><stop offset="0%" stopColor="#fffdf0"/><stop offset="40%" stopColor="#e2c07d"/><stop offset="100%" stopColor="#7a5a20"/></radialGradient>
-          <radialGradient id="moonShad" cx="70%" cy="65%" r="60%"><stop offset="0%" stopColor="rgba(0,0,0,0)"/><stop offset="100%" stopColor="rgba(0,0,0,0.45)"/></radialGradient>
-          <radialGradient id="cr1" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="rgba(0,0,0,0.32)"/><stop offset="60%" stopColor="rgba(0,0,0,0.12)"/><stop offset="100%" stopColor="rgba(255,255,255,0.08)"/></radialGradient>
-          <radialGradient id="cr2" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="rgba(0,0,0,0.22)"/><stop offset="100%" stopColor="rgba(255,255,255,0.06)"/></radialGradient>
-        </defs>
         <circle cx={cx} cy={cy} r="40" fill="url(#moonBase)" clipPath="url(#mcp)" style={{transition:"all 1s ease",filter:"drop-shadow(0 0 18px rgba(226,192,125,0.7))"}}/>
         <circle cx={cx} cy={cy} r="40" fill="url(#moonShad)" clipPath="url(#mcp)" style={{transition:"all 1s ease"}}/>
         <circle cx={cx-9} cy={cy-10} r="8" fill="url(#cr1)" clipPath="url(#mcp)" opacity="0.7"/>
@@ -394,7 +382,9 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
   const cells=[];
   for(let i=0;i<firstDay;i++)cells.push(null);
   for(let d=1;d<=daysInMonth;d++)cells.push(`${yr}-${String(mo+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`);
+
   function getDayPhase(ds){if(!periods.length)return null;const sorted=[...periods].sort((a,b)=>toDate(b.start)-toDate(a.start));const ref=sorted.find(p=>p.start<=ds);if(!ref)return null;return phaseFromDay((daysBetween(ref.start,ds)%avgCycle)+1);}
+  function isPhaseStart(ds){const prev=shiftDays(ds,-1);const phNow=getDayPhase(ds);const phPrev=getDayPhase(prev);if(!phNow)return null;if(!phPrev||phNow.id!==phPrev.id)return phNow;return null;}
   function getPeriodForDay(ds){return periods.find(p=>{const end=p.end||shiftDays(p.start,4);return ds>=p.start&&ds<=end;});}
   function findNearbyPeriod(ds){return periods.find(p=>{const end=p.end||shiftDays(p.start,4);return Math.abs(daysBetween(end,ds))<=7&&ds>p.start;});}
   function handleDayTap(ds){const period=getPeriodForDay(ds);if(period){setModal({ds,mode:"menu",period});return;}const nearby=findNearbyPeriod(ds);setModal(nearby?{ds,mode:"edit",period:nearby}:{ds,mode:"action"});}
@@ -402,6 +392,7 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
   function addEnd(ds){setPeriods(prev=>{const open=[...prev].sort((a,b)=>toDate(b.start)-toDate(a.start)).find(p=>!p.end&&p.start<=ds);if(!open)return[...prev,{id:Date.now(),start:ds,end:null}];return prev.map(p=>p.id===open.id?{...p,end:ds}:p);});setModal(null);}
   function editEnd(id,ds){setPeriods(prev=>prev.map(p=>p.id===id?{...p,end:ds}:p));setModal(null);}
   function deletePeriod(id){setPeriods(prev=>prev.filter(p=>p.id!==id));setModal(null);}
+
   return(
     <div>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
@@ -409,15 +400,7 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
         <div style={{fontSize:15,fontWeight:700,color:C.text}}>{yr}년 {mo+1}월</div>
         <button onClick={()=>setCalMonth(new Date(yr,mo+1,1))} style={{background:"none",border:"none",fontSize:20,color:C.muted,padding:"4px 12px"}}>&#8250;</button>
       </div>
-      <div style={{fontSize:11,color:C.muted,marginBottom:12,textAlign:"center",background:PHASES[0].soft,borderRadius:10,padding:"7px 12px",border:`1px solid ${PHASES[0].border}`}}>날짜를 탭하면 생리 기록을 추가할 수 있어요</div>
-      <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
-        {PHASES.map(p=>(
-          <div key={p.id} style={{display:"flex",alignItems:"center",gap:3}}>
-            <div style={{width:10,height:10,borderRadius:2,background:p.soft,border:`1.5px solid ${p.color}`}}/>
-            <span style={{fontSize:9.5,color:C.muted}}>{p.moon}{p.name}</span>
-          </div>
-        ))}
-      </div>
+      <div style={{fontSize:11,color:C.muted,marginBottom:12,textAlign:"center",background:PHASES[0].soft,borderRadius:10,padding:"7px 12px",border:`1px solid ${PHASES[0].border}`}}>날짜를 탭하면 생리·사랑 기록을 추가할 수 있어요</div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",marginBottom:4}}>
         {["일","월","화","수","목","금","토"].map(d=><div key={d} style={{textAlign:"center",fontSize:10,fontWeight:700,color:C.muted,padding:"4px 0"}}>{d}</div>)}
       </div>
@@ -426,15 +409,18 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
           if(!ds)return <div key={i}/>;
           const isToday=ds===today,ph=getDayPhase(ds),inPeriod=!!getPeriodForDay(ds);
           const inFertile=stats&&ds>=stats.fertileStart&&ds<=stats.fertileEnd,isOvu=stats&&ds===stats.ovulation;
+          const ps=isPhaseStart(ds);
           let bg="transparent",bdr="1px solid transparent",col=C.text;
           if(inPeriod){bg=PHASES[0].soft;bdr=`1.5px solid ${PHASES[0].border}`;col=PHASES[0].text;}
           else if(isOvu){bg=PHASES[3].soft;bdr=`2px solid ${PHASES[3].color}`;col=PHASES[3].text;}
           else if(inFertile){bg="transparent";bdr=`1.5px dashed ${PHASES[3].color}`;col=PHASES[3].text;}
-          else if(ph){bg=`${ph.color}28`;bdr=`1px solid ${ph.color}50`;col=ph.text;}
+          else if(ph){bg=`${ph.color}38`;bdr=`1px solid ${ph.color}60`;col=ph.text;}
           if(isToday)bdr="2px solid rgba(255,255,255,0.6)";
           return(
-            <div key={i} onClick={()=>handleDayTap(ds)} style={{aspectRatio:"1",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:7,background:bg,border:bdr,cursor:"pointer",WebkitTapHighlightColor:"transparent",position:"relative"}}>
-              <span style={{fontSize:11,fontWeight:isToday?700:400,color:col}}>{parseInt(ds.split("-")[2])}</span>               {loveRecords.includes(ds)&&<span style={{fontSize:7,lineHeight:1,position:"absolute",bottom:2,right:3}}>❤️</span>}
+            <div key={i} onClick={()=>handleDayTap(ds)} style={{aspectRatio:"1",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:7,background:bg,border:bdr,cursor:"pointer",WebkitTapHighlightColor:"transparent",position:"relative",flexDirection:"column",gap:0}}>
+              <span style={{fontSize:11,fontWeight:isToday?700:400,color:col,lineHeight:1}}>{parseInt(ds.split("-")[2])}</span>
+              {ps&&!inPeriod&&<span style={{fontSize:6,color:ps.text,fontWeight:700,lineHeight:1.2,textAlign:"center"}}>{ps.name}</span>}
+              {loveRecords.includes(ds)&&<span style={{fontSize:7,lineHeight:1,position:"absolute",top:1,right:2}}>❤️</span>}
             </div>
           );
         })}
@@ -539,113 +525,14 @@ function loadNotifPrefs(){try{const r=localStorage.getItem(NOTIF_KEY);return r?J
 async function requestAndNotify(title,body){if(!("Notification" in window)){alert("이 브라우저는 알림을 지원하지 않아요");return;}let perm=Notification.permission;if(perm==="default")perm=await Notification.requestPermission();if(perm==="granted")new Notification(title,{body,icon:"/favicon.ico"});else alert("알림 권한이 거부됐어요.");}
 function Toggle({on,onChange}){return(<div onClick={()=>onChange(!on)} style={{width:44,height:24,borderRadius:12,flexShrink:0,cursor:"pointer",background:on?PHASES[1].color:"rgba(255,255,255,0.15)",position:"relative",transition:"background 0.2s"}}><div style={{position:"absolute",top:3,left:on?22:3,width:18,height:18,borderRadius:"50%",background:"white",boxShadow:"0 1px 4px rgba(0,0,0,0.3)",transition:"left 0.2s"}}/></div>);}
 
- function PhaseBar({dp, stats, togglePhase}) {
-  const selIdx = PHASES.findIndex(p => p.id === dp?.id);
-  const [scale, setScale] = useState(1);
-  const prevIdx = useRef(-1);
-
-  useEffect(() => {
-    if (prevIdx.current !== selIdx && selIdx >= 0) {
-      setScale(1.08);
-      const t = setTimeout(() => setScale(1), 350);
-      prevIdx.current = selIdx;
-      return () => clearTimeout(t);
-    }
-  }, [selIdx]);
-
-  const W = 100 / PHASES.length;
-  const sel = selIdx >= 0 ? PHASES[selIdx] : null;
-
-  return (
-    <div style={{marginBottom:20}}>
-      <div style={{fontSize:10,color:C.muted,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:9,fontWeight:600}}>달 위상 탐색</div>
-      <div style={{position:"relative",borderRadius:18,background:"rgba(255,255,255,0.03)",border:`1px solid ${C.border}`,overflow:"hidden"}}>
-
-        {/* 슬라이딩 유리 인디케이터 */}
-        {sel && (
-          <>
-            {/* 메인 필 */}
-            <div style={{
-              position:"absolute", top:4, bottom:4,
-              left:`calc(${selIdx} * ${W}% + 3px)`,
-              width:`calc(${W}% - 6px)`,
-              borderRadius:12,
-              background:sel.soft,
-              border:`1.5px solid ${sel.color}22`, 
-              backdropFilter:"blur(12px)",
-              boxShadow:`0 0 16px ${sel.color}50, inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.25)`,
-              transform:`scaleY(${scale}) scaleX(${0.96 + scale * 0.04})`,
-              transformOrigin:"center",
-              transition:"left 0.55s cubic-bezier(0.34,1.56,0.64,1), border-color 0.3s, box-shadow 0.3s, transform 0.35s cubic-bezier(0.34,1.56,0.64,1)",
-              pointerEvents:"none", zIndex:1,
-            }}/>
-            {/* 유리 렌즈 하이라이트 */}
-            <div style={{
-              position:"absolute", top:4, bottom:4,
-              left:`calc(${selIdx} * ${W}% + 3px)`,
-              width:`calc(${W}% - 6px)`,
-              borderRadius:12,
-              background:"radial-gradient(ellipse at 35% 25%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.04) 55%, transparent 100%)",
-              transform:`scaleY(${scale}) scaleX(${0.96 + scale * 0.04})`,
-              transformOrigin:"center",
-              transition:"left 0.55s cubic-bezier(0.34,1.56,0.64,1), transform 0.35s cubic-bezier(0.34,1.56,0.64,1)",
-              pointerEvents:"none", zIndex:2,
-            }}/>
-            {/* 좌우 엣지 왜곡 글로우 */}
-            <div style={{
-              position:"absolute", top:0, bottom:0,
-              left:`calc(${selIdx} * ${W}% - 2px)`,
-              width:`calc(${W}% + 4px)`,
-              background:`radial-gradient(ellipse at left, ${sel.color}18 0%, transparent 40%) left / 50% 100% no-repeat, radial-gradient(ellipse at right, ${sel.color}18 0%, transparent 40%) right / 50% 100% no-repeat`,
-              transform:`scaleY(${scale})`,
-              transformOrigin:"center",
-              transition:"left 0.55s cubic-bezier(0.34,1.56,0.64,1), transform 0.35s cubic-bezier(0.34,1.56,0.64,1)",
-              pointerEvents:"none", zIndex:1,
-            }}/>
-          </>
-        )}
-
-        {/* 위상 아이템들 */}
-        <div style={{display:"flex",position:"relative",zIndex:3}}>
-          {PHASES.map((p,i) => {
-            const isSel = p.id === dp?.id;
-            const isToday = p.id === stats?.phase?.id;
-            return (
-              <button key={p.id} onClick={()=>togglePhase(p.id)} style={{
-                flex:1, padding:"11px 2px 9px", border:"none", background:"transparent",
-                display:"flex", flexDirection:"column", alignItems:"center", gap:3, cursor:"pointer",
-              }}>
-                <span style={{
-                  fontSize:17, lineHeight:1,
-                  filter:isSel?`drop-shadow(0 0 7px ${p.color})`:"none",
-                  transform:isSel?`scale(${scale})`:"scale(1)",
-                  transition:"filter 0.3s, transform 0.35s cubic-bezier(0.34,1.56,0.64,1)",
-                  display:"block",
-                }}>{p.moon}</span>
-                <span style={{
-                  fontSize:8.5, fontWeight:700, lineHeight:1.3, textAlign:"center",
-                  color:isSel?p.text:C.muted,
-                  transition:"color 0.3s",
-                }}>{p.name}</span>
-                {isToday && <div style={{width:3,height:3,borderRadius:"50%",background:p.color,marginTop:1}}/>}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
- 
 function MyPage({stats,periods,user}){
   const[prefs,setPrefs]=useState(loadNotifPrefs);
-  const [editingKey,setEditingKey]=useState(null);
-const [customMsgs,setCustomMsgs]=useState(()=>{try{return JSON.parse(localStorage.getItem("notif-msgs-v1")||"{}");}catch{return {};}});
-function saveMsg(key,val){const next={...customMsgs,[key]:val.slice(0,20)};setCustomMsgs(next);localStorage.setItem("notif-msgs-v1",JSON.stringify(next));}
+  const[editingKey,setEditingKey]=useState(null);
+  const[customMsgs,setCustomMsgs]=useState(()=>{try{return JSON.parse(localStorage.getItem("notif-msgs-v1")||"{}");}catch{return {};}});
   const[notifPerm,setNotifPerm]=useState(typeof Notification!=="undefined"?Notification.permission:"unsupported");
   useEffect(()=>{try{localStorage.setItem(NOTIF_KEY,JSON.stringify(prefs));}catch{}},[prefs]);
   function set(key,val){setPrefs(p=>({...p,[key]:val}));}
+  function saveMsg(key,val){const next={...customMsgs,[key]:val.slice(0,20)};setCustomMsgs(next);localStorage.setItem("notif-msgs-v1",JSON.stringify(next));}
   const NOTIF_ITEMS=[
     {key:"period3",label:"생리 예정 D-3",desc:"생리 3일 전 미리 알림",defaultMsg:"D-3입니다."},
     {key:"period1",label:"생리 예정 D-1",desc:"생리 하루 전 알림",defaultMsg:"내일 생리 예정이에요."},
@@ -654,6 +541,7 @@ function saveMsg(key,val){const next={...customMsgs,[key]:val.slice(0,20)};setCu
     {key:"phaseChange",label:"위상 변경",desc:"새 달 위상 시작일 알림",defaultMsg:"새 위상이 시작됐어요."},
     {key:"dailyTip",label:"오늘의 팁",desc:"현재 위상 맞춤 조언",defaultMsg:"오늘의 팁을 확인하세요."},
   ];
+  return(
     <div>
       {user&&(
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:"14px 16px",marginBottom:20,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -702,13 +590,10 @@ function saveMsg(key,val){const next={...customMsgs,[key]:val.slice(0,20)};setCu
             </div>
             {editingKey===item.key&&(
               <div style={{padding:"0 16px 12px",display:"flex",gap:8,alignItems:"center"}}>
-                <input
-                  defaultValue={customMsgs[item.key]||item.defaultMsg}
-                  maxLength={20}
+                <input defaultValue={customMsgs[item.key]||item.defaultMsg} maxLength={20}
                   onKeyDown={e=>{if(e.key==="Enter"){saveMsg(item.key,e.target.value);setEditingKey(null);}}}
                   style={{flex:1,background:"rgba(255,255,255,0.07)",border:`1px solid ${C.border}`,borderRadius:8,color:C.text,padding:"7px 10px",fontSize:12,outline:"none",fontFamily:"system-ui"}}
-                  placeholder="최대 20자"
-                />
+                  placeholder="최대 20자"/>
                 <button onClick={e=>{saveMsg(item.key,e.target.previousSibling.value);setEditingKey(null);}} style={{padding:"7px 12px",background:"rgba(152,152,204,0.2)",border:`1px solid ${PHASES[0].border}`,borderRadius:8,color:C.text,fontSize:11,fontWeight:700}}>저장</button>
               </div>
             )}
@@ -780,7 +665,7 @@ export default function App(){
   const[tab,setTab]=useState("dash");
   const[sec,setSec]=useState("tips");
   const[selId,setSelId]=useState(null);
-  const [loveRecords, setLoveRecords] = useState([]);
+  const[loveRecords,setLoveRecords]=useState([]);
   const[ready,setReady]=useState(false);
 
   useEffect(()=>{const unsub=onAuthStateChanged(auth,u=>setUser(u??null));return unsub;},[]);
@@ -788,10 +673,13 @@ export default function App(){
   useEffect(()=>{
     if(!user){setLoaded(false);setPeriods([]);return;}
     (async()=>{
-      try{const snap=await getDoc(doc(db,"users",user.uid));if(snap.exists()){
-  const d=snap.data().periods; if(Array.isArray(d))setPeriods(d);
-  const lr=snap.data().loveRecords; if(Array.isArray(lr))setLoveRecords(lr);
-}}catch(e){console.error(e);}
+      try{
+        const snap=await getDoc(doc(db,"users",user.uid));
+        if(snap.exists()){
+          const d=snap.data().periods;if(Array.isArray(d))setPeriods(d);
+          const lr=snap.data().loveRecords;if(Array.isArray(lr))setLoveRecords(lr);
+        }
+      }catch(e){console.error(e);}
       setLoaded(true);setTimeout(()=>setReady(true),400);
     })();
   },[user]);
@@ -917,8 +805,6 @@ export default function App(){
                   </div>
                 </div>
               )}
-              <PhaseBar dp={dp} stats={stats} togglePhase={togglePhase}/>
-
             </>
           )
         )}
