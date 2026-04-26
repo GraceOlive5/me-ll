@@ -384,6 +384,16 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
   for(let d=1;d<=daysInMonth;d++)cells.push(`${yr}-${String(mo+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`);
 
   function getDayPhase(ds){if(!periods.length)return null;const sorted=[...periods].sort((a,b)=>toDate(b.start)-toDate(a.start));const ref=sorted.find(p=>p.start<=ds);if(!ref)return null;return phaseFromDay((daysBetween(ref.start,ds)%avgCycle)+1);}
+  function getPhasePos(ds){
+  const ph=getDayPhase(ds);
+  if(!ph||getPeriodForDay(ds))return null;
+  const phPrev=getDayPhase(shiftDays(ds,-1));
+  const phNext=getDayPhase(shiftDays(ds,1));
+  const dow=toDate(ds).getDay(); // 0=일,6=토
+  const isStart=!phPrev||phPrev.id!==ph.id||dow===0;
+  const isEnd=!phNext||phNext.id!==ph.id||dow===6;
+  return{ph,isStart,isEnd};
+}
   function isPhaseStart(ds){const prev=shiftDays(ds,-1);const phNow=getDayPhase(ds);const phPrev=getDayPhase(prev);if(!phNow)return null;if(!phPrev||phNow.id!==phPrev.id)return phNow;return null;}
   function getPeriodForDay(ds){return periods.find(p=>{const end=p.end||shiftDays(p.start,4);return ds>=p.start&&ds<=end;});}
   function findNearbyPeriod(ds){return periods.find(p=>{const end=p.end||shiftDays(p.start,4);return Math.abs(daysBetween(end,ds))<=7&&ds>p.start;});}
@@ -404,7 +414,7 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
       <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",marginBottom:4}}>
         {["일","월","화","수","목","금","토"].map(d=><div key={d} style={{textAlign:"center",fontSize:10,fontWeight:700,color:C.muted,padding:"4px 0"}}>{d}</div>)}
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:3}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:"2px 0"}}>
         {cells.map((ds,i)=>{
           if(!ds)return <div key={i}/>;
           const isToday=ds===today,ph=getDayPhase(ds),inPeriod=!!getPeriodForDay(ds);
@@ -417,11 +427,37 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
           else if(ph){bg=`${ph.color}38`;bdr=`1px solid ${ph.color}60`;col=ph.text;}
           if(isToday)bdr="2px solid rgba(255,255,255,0.6)";
           return(
-            <div key={i} onClick={()=>handleDayTap(ds)} style={{aspectRatio:"1",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:7,background:bg,border:bdr,cursor:"pointer",WebkitTapHighlightColor:"transparent",position:"relative",flexDirection:"column",gap:0}}>
-              <span style={{fontSize:11,fontWeight:isToday?700:400,color:col,lineHeight:1}}>{parseInt(ds.split("-")[2])}</span>
-              {ps&&!inPeriod&&<span style={{fontSize:6,color:ps.text,fontWeight:700,lineHeight:1.2,textAlign:"center"}}>{ps.name}</span>}
-              {loveRecords.includes(ds)&&<span style={{fontSize:7,lineHeight:1,position:"absolute",top:1,right:2}}>❤️</span>}
+            
+const pp=getPhasePos(ds);
+          const bandBg=pp?`${pp.ph.color}55`:"transparent";
+          const bandBdr=pp?`${pp.ph.color}99`:"transparent";
+          const rTL=(!pp||pp.isStart)?"8px":"0";
+          const rTR=(!pp||pp.isEnd)?"8px":"0";
+          const rBL=(!pp||pp.isStart)?"8px":"0";
+          const rBR=(!pp||pp.isEnd)?"8px":"0";
+          const finalBg=inPeriod?PHASES[0].soft:isOvu?PHASES[3].soft:inFertile?"transparent":pp?bandBg:"transparent";
+          const finalBdr=inPeriod?`1.5px solid ${PHASES[0].border}`:isOvu?`2px solid ${PHASES[3].color}`:inFertile?`1.5px dashed ${PHASES[3].color}`:pp?`1px solid ${bandBdr}`:"1px solid transparent";
+          const finalRad=inPeriod||!pp?`8px`:`${rTL} ${rTR} ${rBR} ${rBL}`;
+          const finalCol=inPeriod?PHASES[0].text:isOvu?PHASES[3].text:inFertile?PHASES[3].text:pp?pp.ph.text:C.text;
+          if(isToday){
+            const finalBdrToday="2px solid rgba(255,255,255,0.75)";
+            return(
+              <div key={i} onClick={()=>handleDayTap(ds)} style={{aspectRatio:"1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",borderRadius:finalRad,background:finalBg,border:finalBdrToday,cursor:"pointer",WebkitTapHighlightColor:"transparent",position:"relative",gap:0,margin:"1px"}}>
+                <span style={{fontSize:11,fontWeight:700,color:finalCol,lineHeight:1}}>{parseInt(ds.split("-")[2])}</span>
+                {pp?.isStart&&<span style={{fontSize:6,color:pp.ph.text,fontWeight:700,lineHeight:1.2}}>{pp.ph.name}</span>}
+                {loveRecords.includes(ds)&&<span style={{fontSize:7,position:"absolute",top:1,right:2}}>❤️</span>}
+              </div>
+            );
+          }
+          return(
+            <div key={i} onClick={()=>handleDayTap(ds)} style={{aspectRatio:"1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",borderRadius:finalRad,background:finalBg,border:finalBdr,cursor:"pointer",WebkitTapHighlightColor:"transparent",position:"relative",gap:0}}>
+              <span style={{fontSize:11,fontWeight:400,color:finalCol,lineHeight:1}}>{parseInt(ds.split("-")[2])}</span>
+              {pp?.isStart&&!inPeriod&&<span style={{fontSize:6,color:pp.ph.text,fontWeight:700,lineHeight:1.2}}>{pp.ph.name}</span>}
+              {loveRecords.includes(ds)&&<span style={{fontSize:7,position:"absolute",top:1,right:2}}>❤️</span>}
             </div>
+          );
+
+            
           );
         })}
       </div>
