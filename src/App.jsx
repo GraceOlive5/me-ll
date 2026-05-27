@@ -672,8 +672,8 @@ export default function App(){
   const[selId,setSelId]=useState(null);
   const[loveRecords,setLoveRecords]=useState([]);
   const[ready,setReady]=useState(false);
-  // 로드 직후 빈 데이터로 덮어쓰기 방지
-  const saveGuardRef=useRef(false);
+  // 로드 직후 한 번만 저장 스킵 (빈 데이터 덮어쓰기 방지)
+  const justLoadedRef=useRef(false);
 
   useEffect(()=>{const unsub=onAuthStateChanged(auth,u=>setUser(u??null));return unsub;},[]);
 
@@ -682,7 +682,7 @@ export default function App(){
       setLoaded(false);
       setPeriods([]);
       setLoveRecords([]);
-      saveGuardRef.current=false;
+      justLoadedRef.current=false;
       return;
     }
     (async()=>{
@@ -695,15 +695,20 @@ export default function App(){
           if(Array.isArray(lr))setLoveRecords(lr);
         }
       }catch(e){console.error("Firestore load error:",e);}
+      // 로드 완료 직후 저장 effect가 한 번 스킵되도록 표시
+      justLoadedRef.current=true;
       setLoaded(true);
-      // 로드 완료 후 한 렌더 사이클 뒤에 저장 허용
-      setTimeout(()=>{saveGuardRef.current=true;setReady(true);},600);
+      setTimeout(()=>setReady(true),400);
     })();
   },[user]);
 
-  // saveGuard가 true일 때만 저장 (로드 직후 덮어쓰기 방지)
+  // 로드 직후 첫 실행은 스킵, 이후 데이터 변경 시 즉시 저장
   useEffect(()=>{
-    if(!user||!loaded||!saveGuardRef.current)return;
+    if(!user||!loaded)return;
+    if(justLoadedRef.current){
+      justLoadedRef.current=false;
+      return;
+    }
     setDoc(doc(db,"users",user.uid),{periods,loveRecords},{merge:true}).catch(console.error);
   },[periods,loveRecords,loaded,user]);
 
