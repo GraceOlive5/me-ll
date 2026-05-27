@@ -273,7 +273,7 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
         {PA.map(pa=>{
           const ph=PHASES.find(p=>p.id===pa.id);
           const isSel=pa.id===selId,isTod=pa.id===todayId,span=pa.e-pa.s;
-          const fs=span<42?"8":span<55?"9":span<90?"9.5":"10";
+          const fs=span<42?"11":span<55?"12":span<90?"13":"14";
           return(
             <text key={pa.id} fontFamily="system-ui,sans-serif" fontSize={fs} fontWeight="600"
               fill={isSel||isTod?"#ffffff":"rgba(255,255,255,0.75)"}
