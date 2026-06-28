@@ -347,7 +347,9 @@ function DdayRow({stats}){
       </div>
       <div style={{display:"flex",alignItems:"flex-start",gap:6,padding:"8px 12px",background:"rgba(152,152,204,0.08)",borderRadius:10,border:`1px solid ${C.border}`}}>
         <span style={{fontSize:11,color:C.muted,flexShrink:0,marginTop:1}}>⚠️</span>
-        <p style={{margin:0,fontSize:10.5,color:C.muted,lineHeight:1.65}}>임신 확률 및 가임기 정보는 <strong style={{color:C.text}}>통계적 추정치</strong>로, 개인차가 있으며 의학적 진단을 대체하지 않습니다. 임신 계획 또는 피임 목적으로 사용 시 전문 의료인과 반드시 상담하세요.</p>
+       <p style={{margin:0,fontSize:10.5,color:C.muted,lineHeight:1.65}}>
+  표시된 임신 확률 및 가임기 정보는 <strong style={{color:C.text}}>인구 통계 기반 통계적 추정치</strong>입니다. 개인의 실제 임신 가능성과 다를 수 있으며, <strong style={{color:C.text}}>의학적 진단·피임·임신 계획의 근거로 사용할 수 없습니다.</strong> 임신 계획 또는 피임이 필요하다면 반드시 산부인과 전문의와 상담하세요.
+</p>
       </div>
     </div>
   );
@@ -630,7 +632,9 @@ function MyPage({stats,periods,user}){
       </div>
       <div style={{marginTop:12,padding:"14px 16px",background:"rgba(152,152,204,0.06)",borderRadius:14,border:`1px solid ${C.border}`}}>
         <div style={{fontSize:11,fontWeight:700,color:C.text,marginBottom:7}}>⚠️ 이용 안내 및 면책 고지</div>
-        <p style={{margin:0,fontSize:10.5,color:C.muted,lineHeight:1.75}}>본 앱이 제공하는 정보는 <strong style={{color:C.text}}>일반적인 통계와 참고 자료</strong>에 기반하며, 의학적 진단·치료를 대체하지 않습니다.</p>
+        <p style={{margin:0,fontSize:10.5,color:C.muted,lineHeight:1.75}}>
+  본 앱이 제공하는 생리 예측, 가임기, 임신 확률 정보는 <strong style={{color:C.text}}>통계적 참고 자료</strong>에 기반하며, 개인의 실제 상황과 다를 수 있습니다. <strong style={{color:C.text}}>의학적 진단, 피임, 임신 계획의 대체 수단이 아닙니다.</strong> 건강 이상이나 임신 관련 사항은 반드시 산부인과 전문의와 상담하시기 바랍니다.
+</p>
       </div>
       <div style={{textAlign:"center",padding:"16px 0 4px"}}><div style={{fontSize:10,color:"rgba(255,255,255,0.2)"}}>v1.2.0 · Me:ll</div><div style={{fontSize:9.5,color:"rgba(255,255,255,0.15)",marginTop:2}}>© 2026 hhappyfamilydais · All rights reserved</div></div>
     </div>
