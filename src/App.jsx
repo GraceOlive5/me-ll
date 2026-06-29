@@ -182,11 +182,18 @@ function computeStats(periods){
   }catch(e){console.error("computeStats error:",e);return null;}
 }
 
-const STAR_DATA=(()=>{const arr=[];let v=9301;const rng=()=>{v=(v*49297+233453)%233280;return v/233280;};for(let i=0;i<140;i++)arr.push([rng()*1000,rng()*2200,rng()*0.9+0.2,rng()*0.45+0.1]);return arr;})();
+const STAR_DATA=(()=>{
+  const arr=[];let v=9301;
+  const rng=()=>{v=(v*49297+233453)%233280;return v/233280;};
+  for(let i=0;i<220;i++)arr.push([rng()*1000,rng()*2200,rng()*1.1+0.5,rng()*0.55+0.28]);
+  for(let i=0;i<50;i++) arr.push([rng()*1000,rng()*2200,rng()*0.9+1.4,rng()*0.4+0.5]);
+  for(let i=0;i<18;i++) arr.push([rng()*1000,rng()*2200,rng()*0.7+2.2,rng()*0.25+0.75]);
+  return arr;
+})();
 
 function StarField(){
   return(
-    <div style={{position:"fixed",inset:0,zIndex:0,pointerEvents:"none",overflow:"hidden",background:"radial-gradient(ellipse at 50% 20%, #0e0e2c 0%, #06061a 70%)"}}>
+    <div style={{position:"fixed",inset:0,zIndex:0,pointerEvents:"none",overflow:"hidden",background:"radial-gradient(ellipse at 50% 25%, #16164e 0%, #0c0c2e 45%, #070718 100%)"}}>
       <svg width="100%" height="100%" viewBox="0 0 1000 2200" preserveAspectRatio="xMidYMid slice" style={{position:"absolute",inset:0}}>
         {STAR_DATA.map(([x,y,r,op],i)=><circle key={i} cx={x} cy={y} r={r} fill="white" opacity={op}/>)}
       </svg>
@@ -206,7 +213,7 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
   const mc=MOON_CFG[displayId]||MOON_CFG.wolsik;
   function getMoonPath(il,wx,r){
     if(wx===null){if(il===0)return "M0,0 L0,0";return `M${cx-r},${cy} a${r},${r} 0 1,0 ${r*2},0 a${r},${r} 0 1,0 -${r*2},0`;}
-    const rx=r*Math.abs(1-2*il),sw=il<=0.5?(wx?0:1):(wx?1:0);
+    const rx=r*Math.max(0.13,Math.abs(1-2*il));,sw=il<=0.5?(wx?0:1):(wx?1:0);
     return wx?`M${cx},${cy-r} A${r},${r} 0 0 1 ${cx},${cy+r} A${rx},${r} 0 0 ${sw} ${cx},${cy-r}`:`M${cx},${cy-r} A${r},${r} 0 0 0 ${cx},${cy+r} A${rx},${r} 0 0 ${sw} ${cx},${cy-r}`;
   }
   function textArcPath(s,e){
@@ -215,7 +222,7 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
     else{const p1=polar(cx,cy,Rl,e-pad),p2=polar(cx,cy,Rl,s+pad);return `M${p1.x} ${p1.y} A${Rl} ${Rl} 0 ${(e-s-pad*2)>180?1:0} 0 ${p2.x} ${p2.y}`;}
   }
   return(
-    <div style={{position:"relative",width:320,height:320,margin:"0 auto"}}>
+    <div style={{position:"relative",width:360,height:360,margin:"0 auto"}}>
       <div style={{position:"absolute",inset:10,borderRadius:"50%",background:"rgba(15,15,50,0.6)",border:"1px solid rgba(255,255,255,0.08)",zIndex:0}}/>
       <svg viewBox="0 0 320 320" style={{width:"100%",height:"100%",overflow:"visible",position:"relative",zIndex:1}}>
         <defs>
@@ -293,11 +300,14 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
         <circle cx={cx-9} cy={cy-10} r="8" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="0.8" clipPath="url(#mcp)"/>
         <circle cx={cx+13} cy={cy+7} r="5.5" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="0.7" clipPath="url(#mcp)"/>
         <ellipse cx={cx-10} cy={cy-14} rx="14" ry="10" fill="rgba(255,255,255,0.08)" clipPath="url(#mcp)" style={{filter:"blur(4px)"}}/>
-        {cycleDay!=null&&(
+       {cycleDay!=null&&(
           <>
-            <text x={cx} y={cy+22} textAnchor="middle" fontSize="32" fontWeight="300" fill={displayPhase?.color||"#fff"} fontFamily="system-ui,sans-serif" opacity="0.9">{cycleDay}</text>
-            <text x={cx} y={cy+36} textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.4)" fontFamily="system-ui,sans-serif">/ {totalDays}일</text>
-            <text x={cx} y={cy+50} textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.3)" fontFamily="system-ui,sans-serif">{new Date().toLocaleDateString("ko-KR",{month:"numeric",day:"numeric",weekday:"short"})}</text>
+            <text x={cx} y={cy+66} textAnchor="middle" fontSize="13.5" fontWeight="600" fill="rgba(255,255,255,0.9)" fontFamily="system-ui,sans-serif" letterSpacing="0.03em">
+              {new Date().toLocaleDateString("ko-KR",{month:"long",day:"numeric",weekday:"short"})}
+            </text>
+            <text x={cx} y={cy+84} textAnchor="middle" fontSize="11.5" fill="rgba(255,255,255,0.5)" fontFamily="system-ui,sans-serif">
+              {cycleDay}일째 · {totalDays}일 주기
+            </text>
           </>
         )}
       </svg>
@@ -316,7 +326,6 @@ function MiniStat({label,value,sub,color}){
 }
 
 function DdayRow({stats}){
-  const pColor=stats.pPct>=20?PHASES[3].color:stats.pPct>=12?PHASES[2].color:PHASES[0].color;
   return(
     <div style={{marginBottom:14}}>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:8}}>
@@ -336,12 +345,12 @@ function DdayRow({stats}){
             </>
           )}
         </div>
-        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:"12px 8px",textAlign:"center"}}>
-          <div style={{fontSize:11,color:C.muted,fontWeight:600,marginBottom:5,lineHeight:1.4}}>현재<br/>임신확률</div>
-          <div style={{fontSize:22,fontWeight:700,color:pColor}}>{stats.pPct}%</div>
-          <div style={{fontSize:11,marginTop:2,fontWeight:600,color:pColor}}>{stats.pLabel}</div>
+       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:"12px 8px",textAlign:"center"}}>
+          <div style={{fontSize:11,color:C.muted,fontWeight:600,marginBottom:5,lineHeight:1.4}}>이번<br/>사이클</div>
+          <div style={{fontSize:22,fontWeight:700,color:stats.phase.color}}>{stats.cycleDay}일</div>
+          <div style={{fontSize:11,marginTop:2,color:C.muted}}>/ {stats.avgCycle}일 주기</div>
           <div style={{background:"rgba(255,255,255,0.08)",borderRadius:3,height:3,marginTop:5,overflow:"hidden"}}>
-            <div style={{width:`${(stats.pPct/33)*100}%`,height:"100%",background:pColor,borderRadius:3,transition:"width 0.6s"}}/>
+            <div style={{width:`${Math.min(100,(stats.cycleDay/stats.avgCycle)*100)}%`,height:"100%",background:stats.phase.color,borderRadius:3,transition:"width 0.6s"}}/>
           </div>
         </div>
       </div>
@@ -426,7 +435,7 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
             <div key={i} onClick={()=>handleDayTap(ds)}
               style={{aspectRatio:"1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",borderRadius:finalRad,background:finalBg,border:finalBdr,cursor:"pointer",WebkitTapHighlightColor:"transparent",position:"relative",gap:0}}>
               <span style={{fontSize:11,fontWeight:isToday?700:400,color:finalCol,lineHeight:1}}>{parseInt(ds.split("-")[2])}</span>
-              {pp?.isStart&&!inPeriod&&<span style={{fontSize:6,color:pp.ph.text,fontWeight:700,lineHeight:1.2}}>{pp.ph.name}</span>}
+              {pp?.isStart&&!inPeriod&&<span style={{fontSize:9,color:pp.ph.text,fontWeight:700,lineHeight:1.2}}>{pp.ph.name}</span>}
               {loveRecords.includes(ds)&&<span style={{fontSize:7,position:"absolute",top:1,right:2}}>❤️</span>}
             </div>
           );
