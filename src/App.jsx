@@ -182,18 +182,11 @@ function computeStats(periods){
   }catch(e){console.error("computeStats error:",e);return null;}
 }
 
-const STAR_DATA=(()=>{
-  const arr=[];let v=9301;
-  const rng=()=>{v=(v*49297+233453)%233280;return v/233280;};
-  for(let i=0;i<220;i++)arr.push([rng()*1000,rng()*2200,rng()*1.1+0.5,rng()*0.55+0.28]);
-  for(let i=0;i<50;i++) arr.push([rng()*1000,rng()*2200,rng()*0.9+1.4,rng()*0.4+0.5]);
-  for(let i=0;i<18;i++) arr.push([rng()*1000,rng()*2200,rng()*0.7+2.2,rng()*0.25+0.75]);
-  return arr;
-})();
+const STAR_DATA=(()=>{const arr=[];let v=9301;const rng=()=>{v=(v*49297+233453)%233280;return v/233280;};for(let i=0;i<140;i++)arr.push([rng()*1000,rng()*2200,rng()*0.9+0.2,rng()*0.45+0.1]);return arr;})();
 
 function StarField(){
   return(
-    <div style={{position:"fixed",inset:0,zIndex:0,pointerEvents:"none",overflow:"hidden",background:"radial-gradient(ellipse at 50% 25%, #16164e 0%, #0c0c2e 45%, #070718 100%)"}}>
+    <div style={{position:"fixed",inset:0,zIndex:0,pointerEvents:"none",overflow:"hidden",background:"radial-gradient(ellipse at 50% 20%, #0e0e2c 0%, #06061a 70%)"}}>
       <svg width="100%" height="100%" viewBox="0 0 1000 2200" preserveAspectRatio="xMidYMid slice" style={{position:"absolute",inset:0}}>
         {STAR_DATA.map(([x,y,r,op],i)=><circle key={i} cx={x} cy={y} r={r} fill="white" opacity={op}/>)}
       </svg>
@@ -204,48 +197,169 @@ function StarField(){
 const C={bg:"#07071e",card:"rgba(255,255,255,0.05)",text:"#ede8f5",muted:"#a8a8d0",border:"rgba(255,255,255,0.12)"};
 
 function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
-  const cx=160,cy=160,R=110;
+  const cx=180,cy=180,R=125;
+  const MR=46; // moon radius
   const rotRef=useRef(null);
   const circ=2*Math.PI*R;
   const displayId=selId||todayId;
   const displayPhase=PHASES.find(p=>p.id===displayId);
-  const MOON_CFG={wolsik:{il:0,wx:null},choseung:{il:0.2,wx:true},sanghyun:{il:0.5,wx:true},boreum:{il:1.0,wx:null},hahyun:{il:0.5,wx:false},geumeum:{il:0.2,wx:false}};
-  const mc=MOON_CFG[displayId]||MOON_CFG.wolsik;
-  function getMoonPath(il,wx,r){
-    if(wx===null){if(il===0)return "M0,0 L0,0";return `M${cx-r},${cy} a${r},${r} 0 1,0 ${r*2},0 a${r},${r} 0 1,0 -${r*2},0`;}
-    const rx=r*Math.max(0.13,Math.abs(1-2*il));,sw=il<=0.5?(wx?0:1):(wx?1:0);
-    return wx?`M${cx},${cy-r} A${r},${r} 0 0 1 ${cx},${cy+r} A${rx},${r} 0 0 ${sw} ${cx},${cy-r}`:`M${cx},${cy-r} A${r},${r} 0 0 0 ${cx},${cy+r} A${rx},${r} 0 0 ${sw} ${cx},${cy-r}`;
-  }
+
   function textArcPath(s,e){
-    const mid=(s+e)/2,isBottom=mid>90&&mid<260,pad=8,Rl=R;
+    const mid=(s+e)/2,isBottom=mid>90&&mid<260,pad=4,Rl=R;
     if(!isBottom){const p1=polar(cx,cy,Rl,s+pad),p2=polar(cx,cy,Rl,e-pad);return `M${p1.x} ${p1.y} A${Rl} ${Rl} 0 ${(e-s-pad*2)>180?1:0} 1 ${p2.x} ${p2.y}`;}
     else{const p1=polar(cx,cy,Rl,e-pad),p2=polar(cx,cy,Rl,s+pad);return `M${p1.x} ${p1.y} A${Rl} ${Rl} 0 ${(e-s-pad*2)>180?1:0} 0 ${p2.x} ${p2.y}`;}
   }
+
+  // 달 그리기 — clipPath 없이 레이어 방식
+  function renderMoon(){
+    const id=displayId;
+    if(id==='wolsik') return(
+      <g style={{transition:"all 1s"}}>
+        <circle cx={cx} cy={cy} r={MR} fill="url(#mnDark)"/>
+        <circle cx={cx} cy={cy} r={MR} fill="none" stroke="rgba(80,110,200,0.35)" strokeWidth="1.2"/>
+        <circle cx={cx} cy={cy} r={MR+10} fill="none" stroke="rgba(60,80,180,0.15)" strokeWidth="8" style={{filter:"blur(6px)"}}/>
+      </g>
+    );
+    if(id==='boreum') return(
+      <g style={{transition:"all 1s"}}>
+        <circle cx={cx} cy={cy} r={MR+12} fill="none" stroke="#e8c060" strokeWidth="16" style={{filter:"blur(14px)",opacity:0.4}}/>
+        <circle cx={cx} cy={cy} r={MR+5} fill="none" stroke="#fff8d0" strokeWidth="8" style={{filter:"blur(7px)",opacity:0.3}}/>
+        <circle cx={cx} cy={cy} r={MR} fill="url(#mnLit)"/>
+        <circle cx={cx} cy={cy} r={MR} fill="url(#mnShad)"/>
+        <ellipse cx={cx-MR*0.13} cy={cy-MR*0.1} rx={MR*0.27} ry={MR*0.2} fill="rgba(110,90,40,0.38)"/>
+        <ellipse cx={cx+MR*0.19} cy={cy+MR*0.14} rx={MR*0.17} ry={MR*0.13} fill="rgba(110,90,40,0.28)"/>
+        <ellipse cx={cx+MR*0.04} cy={cy-MR*0.29} rx={MR*0.1} ry={MR*0.09} fill="rgba(110,90,40,0.22)"/>
+        <circle cx={cx} cy={cy} r={MR} fill="url(#mnEdge)"/>
+        <ellipse cx={cx-MR*0.18} cy={cy-MR*0.22} rx={MR*0.22} ry={MR*0.16} fill="rgba(255,255,220,0.12)" style={{filter:"blur(5px)"}}/>
+      </g>
+    );
+    // 반달 — 상현(오른쪽 밝음) / 하현(왼쪽 밝음)
+    if(id==='sanghyun'||id==='hahyun'){
+      const isR=id==='sanghyun';
+      return(
+        <g style={{transition:"all 1s"}}>
+          {/* 외부 글로우 */}
+          <circle cx={cx} cy={cy} r={MR+10} fill="none" stroke="#c8a040" strokeWidth="14" style={{filter:"blur(12px)",opacity:0.28}}/>
+          {/* 어두운 면 */}
+          <circle cx={cx} cy={cy} r={MR} fill="url(#mnDark)"/>
+          {/* 밝은 반구 */}
+          <path
+            d={isR?`M${cx},${cy-MR} A${MR},${MR} 0 1 1 ${cx},${cy+MR} Z`
+                  :`M${cx},${cy-MR} A${MR},${MR} 0 1 0 ${cx},${cy+MR} Z`}
+            fill="url(#mnLit)"/>
+          {/* 구면 음영 */}
+          <circle cx={cx} cy={cy} r={MR} fill="url(#mnShad)"/>
+          {/* 경계면 부드러운 글로우 — 수직 타원 */}
+          <ellipse cx={cx} cy={cy} rx={5} ry={MR-2}
+            fill={isR?"url(#mnTermR)":"url(#mnTermL)"}
+            style={{filter:"blur(4px)",opacity:0.7}}/>
+          <ellipse cx={cx} cy={cy} rx={2} ry={MR-4}
+            fill="rgba(255,235,150,0.25)" style={{filter:"blur(1.5px)"}}/>
+          {/* 가장자리 어둠 */}
+          <circle cx={cx} cy={cy} r={MR} fill="url(#mnEdge)"/>
+          {/* 밝은면 하이라이트 */}
+          <ellipse cx={isR?cx+MR*0.18:cx-MR*0.18} cy={cy-MR*0.2}
+            rx={MR*0.2} ry={MR*0.15}
+            fill="rgba(255,252,220,0.14)" style={{filter:"blur(5px)"}}/>
+        </g>
+      );
+    }
+    // 초승달 / 그믐달
+    const isR=id==='choseung';
+    const termRx=MR*0.62;
+    return(
+      <g style={{transition:"all 1s"}}>
+        <circle cx={cx} cy={cy} r={MR+8} fill="none" stroke="#c89030" strokeWidth="12" style={{filter:"blur(10px)",opacity:0.22}}/>
+        {/* 어두운 구 */}
+        <circle cx={cx} cy={cy} r={MR} fill="url(#mnDark)"/>
+        {/* 밝은 반구 */}
+        <path
+          d={isR?`M${cx},${cy-MR} A${MR},${MR} 0 1 1 ${cx},${cy+MR} Z`
+                :`M${cx},${cy-MR} A${MR},${MR} 0 1 0 ${cx},${cy+MR} Z`}
+          fill="url(#mnLitCres)"/>
+        {/* 안쪽 타원으로 초승달 모양 만들기 */}
+        <ellipse cx={cx+(isR?termRx*0.08:-termRx*0.08)} cy={cy}
+          rx={termRx} ry={MR}
+          fill="url(#mnDark)"/>
+        {/* 구면 음영 */}
+        <circle cx={cx} cy={cy} r={MR} fill="url(#mnShad)"/>
+        {/* 경계면 글로우 */}
+        <ellipse cx={cx+(isR?termRx*0.08:-termRx*0.08)} cy={cy}
+          rx={termRx} ry={MR}
+          fill="none" stroke="rgba(255,200,80,0.45)" strokeWidth="3"
+          style={{filter:"blur(2.5px)"}}/>
+        <circle cx={cx} cy={cy} r={MR} fill="url(#mnEdge)"/>
+      </g>
+    );
+  }
+
   return(
     <div style={{position:"relative",width:360,height:360,margin:"0 auto"}}>
-      <div style={{position:"absolute",inset:10,borderRadius:"50%",background:"rgba(15,15,50,0.6)",border:"1px solid rgba(255,255,255,0.08)",zIndex:0}}/>
-      <svg viewBox="0 0 320 320" style={{width:"100%",height:"100%",overflow:"visible",position:"relative",zIndex:1}}>
+      <div style={{position:"absolute",inset:10,borderRadius:"50%",background:"rgba(12,12,40,0.65)",border:"1px solid rgba(255,255,255,0.07)",zIndex:0}}/>
+      <svg viewBox="0 0 360 360" style={{width:"100%",height:"100%",overflow:"visible",position:"relative",zIndex:1}}>
         <defs>
           {PA.map(pa=><path key={pa.id} id={`tp-${pa.id}`} d={textArcPath(pa.s,pa.e)} fill="none"/>)}
-          <clipPath id="mcp"><path d={getMoonPath(mc.il,mc.wx,40)}/></clipPath>
-          <radialGradient id="moonBase" cx="38%" cy="35%" r="65%"><stop offset="0%" stopColor="#fffdf0"/><stop offset="40%" stopColor="#e2c07d"/><stop offset="100%" stopColor="#7a5a20"/></radialGradient>
-          <radialGradient id="moonShad" cx="70%" cy="65%" r="60%"><stop offset="0%" stopColor="rgba(0,0,0,0)"/><stop offset="100%" stopColor="rgba(0,0,0,0.45)"/></radialGradient>
-          <radialGradient id="cr1" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="rgba(0,0,0,0.32)"/><stop offset="60%" stopColor="rgba(0,0,0,0.12)"/><stop offset="100%" stopColor="rgba(255,255,255,0.08)"/></radialGradient>
-          <radialGradient id="cr2" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="rgba(0,0,0,0.22)"/><stop offset="100%" stopColor="rgba(255,255,255,0.06)"/></radialGradient>
+          {/* 달 그라디언트 */}
+          <radialGradient id="mnDark" cx="38%" cy="30%" r="72%">
+            <stop offset="0%" stopColor="#1c2848"/>
+            <stop offset="55%" stopColor="#0d1630"/>
+            <stop offset="100%" stopColor="#060b1c"/>
+          </radialGradient>
+          <radialGradient id="mnLit" cx="36%" cy="30%" r="74%">
+            <stop offset="0%" stopColor="#fffef0"/>
+            <stop offset="30%" stopColor="#f5d878"/>
+            <stop offset="68%" stopColor="#c88c28"/>
+            <stop offset="100%" stopColor="#6a420e"/>
+          </radialGradient>
+          <radialGradient id="mnLitCres" cx="22%" cy="32%" r="82%">
+            <stop offset="0%" stopColor="#fff8d8"/>
+            <stop offset="38%" stopColor="#e8b838"/>
+            <stop offset="100%" stopColor="#7a4e0e"/>
+          </radialGradient>
+          <radialGradient id="mnShad" cx="62%" cy="62%" r="68%">
+            <stop offset="0%" stopColor="rgba(0,0,0,0)"/>
+            <stop offset="65%" stopColor="rgba(0,0,12,0.28)"/>
+            <stop offset="100%" stopColor="rgba(0,0,20,0.58)"/>
+          </radialGradient>
+          <radialGradient id="mnEdge" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="rgba(0,0,0,0)"/>
+            <stop offset="72%" stopColor="rgba(0,0,0,0)"/>
+            <stop offset="100%" stopColor="rgba(0,0,0,0.55)"/>
+          </radialGradient>
+          {/* 경계면 글로우 그라디언트 */}
+          <linearGradient id="mnTermR" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="rgba(255,220,100,0)"/>
+            <stop offset="50%" stopColor="rgba(255,225,120,0.9)"/>
+            <stop offset="100%" stopColor="rgba(255,220,100,0)"/>
+          </linearGradient>
+          <linearGradient id="mnTermL" x1="100%" y1="0%" x2="0%" y2="0%">
+            <stop offset="0%" stopColor="rgba(255,220,100,0)"/>
+            <stop offset="50%" stopColor="rgba(255,225,120,0.9)"/>
+            <stop offset="100%" stopColor="rgba(255,220,100,0)"/>
+          </linearGradient>
         </defs>
-        <circle cx={cx} cy={cy} r={R} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="34"/>
+
+        {/* 트랙 링 */}
+        <circle cx={cx} cy={cy} r={R} fill="none" stroke="rgba(255,255,255,0.055)" strokeWidth="36"/>
+
+        {/* 위상 아크 */}
         {PA.map(pa=>{
           const ph=PHASES.find(p=>p.id===pa.id);
           const isSel=pa.id===selId,isTod=pa.id===todayId,span=pa.e-pa.s;
           const p1=polar(cx,cy,R,pa.s+1.5),p2=polar(cx,cy,R,pa.e-1.5),large=(span-3)>180?1:0;
           return(
             <g key={pa.id}>
-              <path d={`M${p1.x} ${p1.y} A${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y}`} fill="none" stroke={ph.color} strokeWidth={isSel?34:28} strokeLinecap="round"
-                opacity={isTod&&!selId?0.65:0.28} style={{transition:"all 0.4s",cursor:"pointer",filter:isSel?`drop-shadow(0 0 8px ${ph.color})`:"none"}} onClick={()=>onSelect(pa.id)}/>
-              <path d={`M${p1.x} ${p1.y} A${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y}`} fill="none" stroke="transparent" strokeWidth="40" style={{cursor:"pointer"}} onClick={()=>onSelect(pa.id)}/>
+              <path d={`M${p1.x} ${p1.y} A${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y}`} fill="none" stroke={ph.color}
+                strokeWidth={isSel?36:28} strokeLinecap="round"
+                opacity={isTod&&!selId?0.65:0.27}
+                style={{transition:"all 0.4s",cursor:"pointer",filter:isSel?`drop-shadow(0 0 10px ${ph.color})`:"none"}}
+                onClick={()=>onSelect(pa.id)}/>
+              <path d={`M${p1.x} ${p1.y} A${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y}`} fill="none" stroke="transparent" strokeWidth="44" style={{cursor:"pointer"}} onClick={()=>onSelect(pa.id)}/>
             </g>
           );
         })}
+
+        {/* 슬라이딩 선택 아크 */}
         {(()=>{
           const actPa=PA.find(pa=>pa.id===(selId||todayId));
           if(!actPa)return null;
@@ -259,53 +373,63 @@ function Clock({angle,selId,todayId,onSelect,ready,cycleDay,totalDays}){
           const rot=rotRef.current;
           return(
             <>
-              <circle cx={cx} cy={cy} r={R} fill="none" stroke={ph.color} strokeWidth="22" strokeLinecap="round"
+              <circle cx={cx} cy={cy} r={R} fill="none" stroke={ph.color} strokeWidth="24" strokeLinecap="round"
                 strokeDasharray={`${dLen} ${circ}`}
-                style={{transform:`rotate(${rot}deg)`,transformOrigin:`${cx}px ${cy}px`,transition:"transform 0.65s cubic-bezier(0.34,1.56,0.64,1), stroke 0.35s",filter:`drop-shadow(0 0 16px ${ph.color})`,opacity:0.88}}/>
-              <circle cx={cx} cy={cy} r={R} fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="8" strokeLinecap="round"
+                style={{transform:`rotate(${rot}deg)`,transformOrigin:`${cx}px ${cy}px`,
+                  transition:"transform 0.65s cubic-bezier(0.34,1.56,0.64,1), stroke 0.35s",
+                  filter:`drop-shadow(0 0 18px ${ph.color})`,opacity:0.9}}/>
+              <circle cx={cx} cy={cy} r={R} fill="none" stroke="rgba(255,255,255,0.26)" strokeWidth="9" strokeLinecap="round"
                 strokeDasharray={`${dLen*0.28} ${circ}`}
-                style={{transform:`rotate(${rot+span*0.08}deg)`,transformOrigin:`${cx}px ${cy}px`,transition:"transform 0.65s cubic-bezier(0.34,1.56,0.64,1)",opacity:0.7}}/>
-              <circle cx={cx} cy={cy} r={R} fill="none" stroke={ph.color} strokeWidth="30" strokeLinecap="round"
+                style={{transform:`rotate(${rot+span*0.08}deg)`,transformOrigin:`${cx}px ${cy}px`,
+                  transition:"transform 0.65s cubic-bezier(0.34,1.56,0.64,1)",opacity:0.65}}/>
+              <circle cx={cx} cy={cy} r={R} fill="none" stroke={ph.color} strokeWidth="32" strokeLinecap="round"
                 strokeDasharray={`3 ${circ}`}
-                style={{transform:`rotate(${rot+span*0.98}deg)`,transformOrigin:`${cx}px ${cy}px`,transition:"transform 0.65s cubic-bezier(0.34,1.56,0.64,1)",opacity:0.5,filter:"blur(3px)"}}/>
+                style={{transform:`rotate(${rot+span*0.98}deg)`,transformOrigin:`${cx}px ${cy}px`,
+                  transition:"transform 0.65s cubic-bezier(0.34,1.56,0.64,1)",opacity:0.45,filter:"blur(3px)"}}/>
             </>
           );
         })()}
+
+        {/* 바늘 */}
         {angle!==null&&(
           <g style={{transform:`rotate(${angle}deg)`,transformOrigin:`${cx}px ${cy}px`,transition:ready?"transform 1.5s cubic-bezier(0.34,1.56,0.64,1)":"none"}}>
-            <line x1={cx} y1={cy} x2={cx} y2={cy-(R-10)} stroke={displayPhase?.color||"#aaa"} strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
-            <line x1={cx} y1={cy} x2={cx} y2={cy-(R-10)} stroke="white" strokeWidth="0.6" strokeLinecap="round" opacity="0.2"/>
+            <line x1={cx} y1={cy} x2={cx} y2={cy-(R-12)} stroke={displayPhase?.color||"#aaa"} strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
+            <line x1={cx} y1={cy} x2={cx} y2={cy-(R-12)} stroke="white" strokeWidth="0.7" strokeLinecap="round" opacity="0.18"/>
           </g>
         )}
+
+        {/* 아크 텍스트 레이블 */}
         {PA.map(pa=>{
           const ph=PHASES.find(p=>p.id===pa.id);
           const isSel=pa.id===selId,isTod=pa.id===todayId,span=pa.e-pa.s;
-          const fs=span<42?"11":span<55?"12":span<90?"13":"14";
+          const fs=span<42?"8.5":span<55?"9.5":span<90?"10":"10.5";
           return(
             <text key={pa.id} fontFamily="system-ui,sans-serif" fontSize={fs} fontWeight="600"
-              fill={isSel||isTod?"#ffffff":"rgba(255,255,255,0.75)"}
+              fill={isSel||isTod?"#ffffff":"rgba(255,255,255,0.72)"}
               style={{cursor:"pointer",transition:"fill 0.3s"}} onClick={()=>onSelect(pa.id)}>
               <textPath href={`#tp-${pa.id}`} startOffset="50%" textAnchor="middle">{ph.name} {ph.season}</textPath>
             </text>
           );
         })}
-        <circle cx={cx} cy={cy} r="52" fill="none" stroke="#E2C07D" strokeWidth="12" style={{filter:"blur(14px)",opacity:0.35,transition:"all 1s ease"}} clipPath="url(#mcp)"/>
-        <circle cx={cx} cy={cy} r="44" fill="none" stroke="#fffbe8" strokeWidth="6" style={{filter:"blur(7px)",opacity:0.25,transition:"all 1s ease"}} clipPath="url(#mcp)"/>
-        <circle cx={cx} cy={cy} r="40" fill="url(#moonBase)" clipPath="url(#mcp)" style={{transition:"all 1s ease",filter:"drop-shadow(0 0 18px rgba(226,192,125,0.7))"}}/>
-        <circle cx={cx} cy={cy} r="40" fill="url(#moonShad)" clipPath="url(#mcp)" style={{transition:"all 1s ease"}}/>
-        <circle cx={cx-9} cy={cy-10} r="8" fill="url(#cr1)" clipPath="url(#mcp)" opacity="0.7"/>
-        <circle cx={cx+13} cy={cy+7} r="5.5" fill="url(#cr1)" clipPath="url(#mcp)" opacity="0.6"/>
-        <circle cx={cx-4} cy={cy+13} r="4" fill="url(#cr2)" clipPath="url(#mcp)" opacity="0.5"/>
-        <circle cx={cx+8} cy={cy-16} r="3" fill="url(#cr2)" clipPath="url(#mcp)" opacity="0.45"/>
-        <circle cx={cx-9} cy={cy-10} r="8" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="0.8" clipPath="url(#mcp)"/>
-        <circle cx={cx+13} cy={cy+7} r="5.5" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="0.7" clipPath="url(#mcp)"/>
-        <ellipse cx={cx-10} cy={cy-14} rx="14" ry="10" fill="rgba(255,255,255,0.08)" clipPath="url(#mcp)" style={{filter:"blur(4px)"}}/>
-       {cycleDay!=null&&(
+
+        {/* 달 일러스트 */}
+        {renderMoon()}
+
+        {/* 날짜 정보 — 달 아래 */}
+        {cycleDay!=null&&(
           <>
-            <text x={cx} y={cy+66} textAnchor="middle" fontSize="13.5" fontWeight="600" fill="rgba(255,255,255,0.9)" fontFamily="system-ui,sans-serif" letterSpacing="0.03em">
+            <text x={cx} y={cy+MR+20} textAnchor="middle"
+              fontSize="13.5" fontWeight="700"
+              fill="rgba(255,255,255,0.95)"
+              fontFamily="system-ui,sans-serif"
+              style={{filter:"drop-shadow(0 1px 4px rgba(0,0,0,0.8))"}}>
               {new Date().toLocaleDateString("ko-KR",{month:"long",day:"numeric",weekday:"short"})}
             </text>
-            <text x={cx} y={cy+84} textAnchor="middle" fontSize="11.5" fill="rgba(255,255,255,0.5)" fontFamily="system-ui,sans-serif">
+            <text x={cx} y={cy+MR+38} textAnchor="middle"
+              fontSize="12" fontWeight="500"
+              fill={displayPhase?.color||"rgba(255,255,255,0.7)"}
+              fontFamily="system-ui,sans-serif"
+              style={{filter:"drop-shadow(0 1px 3px rgba(0,0,0,0.7))"}}>
               {cycleDay}일째 · {totalDays}일 주기
             </text>
           </>
@@ -326,6 +450,7 @@ function MiniStat({label,value,sub,color}){
 }
 
 function DdayRow({stats}){
+  const pColor=stats.pPct>=20?PHASES[3].color:stats.pPct>=12?PHASES[2].color:PHASES[0].color;
   return(
     <div style={{marginBottom:14}}>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:8}}>
@@ -345,20 +470,18 @@ function DdayRow({stats}){
             </>
           )}
         </div>
-       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:"12px 8px",textAlign:"center"}}>
-          <div style={{fontSize:11,color:C.muted,fontWeight:600,marginBottom:5,lineHeight:1.4}}>이번<br/>사이클</div>
-          <div style={{fontSize:22,fontWeight:700,color:stats.phase.color}}>{stats.cycleDay}일</div>
-          <div style={{fontSize:11,marginTop:2,color:C.muted}}>/ {stats.avgCycle}일 주기</div>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:"12px 8px",textAlign:"center"}}>
+          <div style={{fontSize:11,color:C.muted,fontWeight:600,marginBottom:5,lineHeight:1.4}}>현재<br/>임신확률</div>
+          <div style={{fontSize:22,fontWeight:700,color:pColor}}>{stats.pPct}%</div>
+          <div style={{fontSize:11,marginTop:2,fontWeight:600,color:pColor}}>{stats.pLabel}</div>
           <div style={{background:"rgba(255,255,255,0.08)",borderRadius:3,height:3,marginTop:5,overflow:"hidden"}}>
-            <div style={{width:`${Math.min(100,(stats.cycleDay/stats.avgCycle)*100)}%`,height:"100%",background:stats.phase.color,borderRadius:3,transition:"width 0.6s"}}/>
+            <div style={{width:`${(stats.pPct/33)*100}%`,height:"100%",background:pColor,borderRadius:3,transition:"width 0.6s"}}/>
           </div>
         </div>
       </div>
       <div style={{display:"flex",alignItems:"flex-start",gap:6,padding:"8px 12px",background:"rgba(152,152,204,0.08)",borderRadius:10,border:`1px solid ${C.border}`}}>
         <span style={{fontSize:11,color:C.muted,flexShrink:0,marginTop:1}}>⚠️</span>
-       <p style={{margin:0,fontSize:10.5,color:C.muted,lineHeight:1.65}}>
-  표시된 임신 확률 및 가임기 정보는 <strong style={{color:C.text}}>인구 통계 기반 통계적 추정치</strong>입니다. 개인의 실제 임신 가능성과 다를 수 있으며, <strong style={{color:C.text}}>의학적 진단·피임·임신 계획의 근거로 사용할 수 없습니다.</strong> 임신 계획 또는 피임이 필요하다면 반드시 산부인과 전문의와 상담하세요.
-</p>
+        <p style={{margin:0,fontSize:10.5,color:C.muted,lineHeight:1.65}}>임신 확률 및 가임기 정보는 <strong style={{color:C.text}}>통계적 추정치</strong>로, 개인차가 있으며 의학적 진단을 대체하지 않습니다. 임신 계획 또는 피임 목적으로 사용 시 전문 의료인과 반드시 상담하세요.</p>
       </div>
     </div>
   );
@@ -380,10 +503,14 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
   function getPhasePos(ds){
     const ph=getDayPhase(ds);
     if(!ph||getPeriodForDay(ds))return null;
-    const phPrev=getDayPhase(shiftDays(ds,-1));
-    const phNext=getDayPhase(shiftDays(ds,1));
+    const prevDay=shiftDays(ds,-1);
+    const nextDay=shiftDays(ds,1);
+    const phPrev=getDayPhase(prevDay);
+    const phNext=getDayPhase(nextDay);
     const dow=toDate(ds).getDay();
-    const isStart=!phPrev||phPrev.id!==ph.id||dow===0;
+    // 이전 날이 period인 경우도 밴드 시작으로 처리 (종료일 변경 후 연속성 유지)
+    const prevInPeriod=!!getPeriodForDay(prevDay);
+    const isStart=!phPrev||phPrev.id!==ph.id||dow===0||prevInPeriod;
     const isEnd=!phNext||phNext.id!==ph.id||dow===6;
     return{ph,isStart,isEnd};
   }
@@ -435,7 +562,7 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
             <div key={i} onClick={()=>handleDayTap(ds)}
               style={{aspectRatio:"1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",borderRadius:finalRad,background:finalBg,border:finalBdr,cursor:"pointer",WebkitTapHighlightColor:"transparent",position:"relative",gap:0}}>
               <span style={{fontSize:11,fontWeight:isToday?700:400,color:finalCol,lineHeight:1}}>{parseInt(ds.split("-")[2])}</span>
-              {pp?.isStart&&!inPeriod&&<span style={{fontSize:9,color:pp.ph.text,fontWeight:700,lineHeight:1.2}}>{pp.ph.name}</span>}
+              {pp?.isStart&&!inPeriod&&<span style={{fontSize:10,color:pp.ph.text,fontWeight:700,lineHeight:1.3}}>{pp.ph.name}</span>}
               {loveRecords.includes(ds)&&<span style={{fontSize:7,position:"absolute",top:1,right:2}}>❤️</span>}
             </div>
           );
@@ -641,9 +768,7 @@ function MyPage({stats,periods,user}){
       </div>
       <div style={{marginTop:12,padding:"14px 16px",background:"rgba(152,152,204,0.06)",borderRadius:14,border:`1px solid ${C.border}`}}>
         <div style={{fontSize:11,fontWeight:700,color:C.text,marginBottom:7}}>⚠️ 이용 안내 및 면책 고지</div>
-        <p style={{margin:0,fontSize:10.5,color:C.muted,lineHeight:1.75}}>
-  본 앱이 제공하는 생리 예측, 가임기, 임신 확률 정보는 <strong style={{color:C.text}}>통계적 참고 자료</strong>에 기반하며, 개인의 실제 상황과 다를 수 있습니다. <strong style={{color:C.text}}>의학적 진단, 피임, 임신 계획의 대체 수단이 아닙니다.</strong> 건강 이상이나 임신 관련 사항은 반드시 산부인과 전문의와 상담하시기 바랍니다.
-</p>
+        <p style={{margin:0,fontSize:10.5,color:C.muted,lineHeight:1.75}}>본 앱이 제공하는 정보는 <strong style={{color:C.text}}>일반적인 통계와 참고 자료</strong>에 기반하며, 의학적 진단·치료를 대체하지 않습니다.</p>
       </div>
       <div style={{textAlign:"center",padding:"16px 0 4px"}}><div style={{fontSize:10,color:"rgba(255,255,255,0.2)"}}>v1.2.0 · Me:ll</div><div style={{fontSize:9.5,color:"rgba(255,255,255,0.15)",marginTop:2}}>© 2026 hhappyfamilydais · All rights reserved</div></div>
     </div>
