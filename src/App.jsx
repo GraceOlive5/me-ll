@@ -471,7 +471,7 @@ function DdayRow({stats}){
           )}
         </div>
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:"12px 8px",textAlign:"center"}}>
-          <div style={{fontSize:11,color:C.muted,fontWeight:600,marginBottom:5,lineHeight:1.4}}>현재<br/>임신확률</div>
+          <div style={{fontSize:11,color:C.muted,fontWeight:600,marginBottom:5,lineHeight:1.4}}>임신가능성<br/>(통계기반)</div>
           <div style={{fontSize:22,fontWeight:700,color:pColor}}>{stats.pPct}%</div>
           <div style={{fontSize:11,marginTop:2,fontWeight:600,color:pColor}}>{stats.pLabel}</div>
           <div style={{background:"rgba(255,255,255,0.08)",borderRadius:3,height:3,marginTop:5,overflow:"hidden"}}>
