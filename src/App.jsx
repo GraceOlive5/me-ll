@@ -498,7 +498,23 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
   for(let i=0;i<firstDay;i++)cells.push(null);
   for(let d=1;d<=daysInMonth;d++)cells.push(`${yr}-${String(mo+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`);
 
-  function getDayPhase(ds){if(!periods.length)return null;const sorted=[...periods].sort((a,b)=>toDate(b.start)-toDate(a.start));const ref=sorted.find(p=>p.start<=ds);if(!ref)return null;return phaseFromDay((daysBetween(ref.start,ds)%avgCycle)+1);}
+  function getDayPhase(ds){
+    if(!periods.length)return null;
+    const sorted=[...periods].sort((a,b)=>toDate(b.start)-toDate(a.start));
+    const refIdx=sorted.findIndex(p=>p.start<=ds);
+    if(refIdx===-1)return null;
+    const ref=sorted[refIdx];
+    // 이 사이클의 실제 길이 — 다음 생리 시작일을 알면 그 간격을 사용
+    const nextP=refIdx>0?sorted[refIdx-1]:null;
+    let cycleLen=avgCycle;
+    if(nextP){const g=daysBetween(ref.start,nextP.start);if(g>=21&&g<=45)cycleLen=g;}
+    let dayInCycle=daysBetween(ref.start,ds)%cycleLen+1;
+    // 생리 종료 후에는 최소 초생(6일)부터 — 종료일이 짧으면 바로 회복기로
+    if(ref.end&&ds>ref.end){
+      dayInCycle=Math.max(dayInCycle,PHASES[1].dayRange[0]);
+    }
+    return phaseFromDay(Math.min(dayInCycle,28));
+  }
   function getPeriodForDay(ds){return periods.find(p=>{const end=p.end||shiftDays(p.start,4);return ds>=p.start&&ds<=end;});}
   function getPhasePos(ds){
     const ph=getDayPhase(ds);
@@ -569,14 +585,24 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
         })}
       </div>
       {stats&&(
-        <div style={{marginTop:14,background:C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:"13px 15px"}}>
-          <div style={{fontWeight:700,color:C.text,marginBottom:8,fontSize:13}}>이번 달 예측</div>
-          {[{label:"다음 생리",date:stats.nextPeriod,ph:PHASES[0],emoji:"🌑"},{label:"배란 예정",date:stats.ovulation,ph:PHASES[3],emoji:"🌕"},{label:"가임기 시작",date:stats.fertileStart,ph:PHASES[3],emoji:"🌿"}].map(s=>(
-            <div key={s.label} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",background:s.ph.soft,borderRadius:10,border:`1px solid ${s.ph.border}`,marginBottom:6}}>
-              <span style={{fontSize:12,color:s.ph.text,fontWeight:600}}>{s.emoji} {s.label}</span>
-              <span style={{fontSize:12,color:s.ph.text,fontWeight:700}}>{fmtKo(s.date)}</span>
-            </div>
-          ))}
+        <div style={{marginTop:14}}>
+          <div style={{fontWeight:700,color:C.text,marginBottom:10,fontSize:13}}>이번 달 예측</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+            {[
+              {label:"다음\n생리",date:stats.nextPeriod,ph:PHASES[0],emoji:"🌑",dTo:stats.dToNext},
+              {label:"배란\n예정",date:stats.ovulation,ph:PHASES[3],emoji:"🌕",dTo:null},
+              {label:"가임기\n시작",date:stats.fertileStart,ph:PHASES[3],emoji:"🌿",dTo:stats.inFertile?null:stats.dToFertile},
+            ].map(s=>(
+              <div key={s.label} style={{background:s.ph.soft,borderRadius:14,padding:"14px 6px 12px",textAlign:"center",border:`1px solid ${s.ph.border}`,display:"flex",flexDirection:"column",alignItems:"center",gap:5}}>
+                <span style={{fontSize:22,lineHeight:1}}>{s.emoji}</span>
+                <span style={{fontSize:10,color:s.ph.text,fontWeight:700,lineHeight:1.45,whiteSpace:"pre-line"}}>{s.label}</span>
+                <span style={{fontSize:12,color:s.ph.text,fontWeight:800,letterSpacing:"-0.02em"}}>{fmtKo(s.date)}</span>
+                {s.dTo!=null&&s.dTo>0&&<span style={{fontSize:10,color:s.ph.text,opacity:0.65,fontWeight:600}}>D-{s.dTo}</span>}
+                {s.dTo===0&&<span style={{fontSize:10,color:s.ph.text,fontWeight:700}}>오늘</span>}
+                {s.label.includes("가임기")&&stats.inFertile&&<span style={{fontSize:9.5,color:s.ph.text,fontWeight:700,background:`${s.ph.color}33`,borderRadius:100,padding:"2px 7px"}}>진행 중</span>}
+              </div>
+            ))}
+          </div>
         </div>
       )}
       {modal&&(
