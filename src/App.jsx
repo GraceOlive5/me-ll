@@ -12,7 +12,8 @@ const firebaseConfig = {
   appId: "1:1049600796280:web:dfa735423e53197d16af8d"
 };
 const firebaseApp = initializeApp(firebaseConfig);
-const auth = getAuth(firebaseApp);
+const _isNative = typeof window !== 'undefined' && window.Capacitor?.isNativePlatform?.();
+const auth = _isNative ? null : getAuth(firebaseApp);
 const db   = getFirestore(firebaseApp);
 
 const PHASES = [
