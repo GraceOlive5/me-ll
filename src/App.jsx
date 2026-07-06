@@ -29,6 +29,13 @@ const PHASES = [
     },
     exercise:["음인 요가 (Child's Pose, 비틀기) — 골반 이완, 생리통 완화","복식호흡 명상 10-15분 — 통증 인식 낮추고 이완 유도","가벼운 스트레칭 — 허리·허벅지 안쪽 위주로","느린 산책 20-30분 — 기분 전환, 무리하지 않게"],
     tips:["온찜질을 아랫배에 15-20분 — 혈관 확장으로 경련 완화","수면 7-9시간 우선 확보, 낮잠도 괜찮아요","고강도 운동은 이 시기엔 쉬어가도 돼요","몸이 보내는 신호를 일기에 기록해두면 다음 달 대비 가능"],
+    bodyRhythm:{
+      intro:"달이 숨는 시간, 몸도 함께 쉬어가요. 에스트로겐과 프로게스테론이 모두 바닥을 찍으면서, 몸이 \"이제 좀 쉬어도 돼\"라고 신호를 보내는 때예요. 평소보다 처지거나 예민해지는 게 당연한 거니 너무 스스로를 몰아붙이지 않아도 괜찮아요.",
+      hormone:"에스트로겐·프로게스테론 모두 최저",
+      bodyTraits:"피로감, 하복부 불편감, 컨디션 저하",
+      exerciseTraits:"회복력이 낮은 시기라 무리하면 오히려 다음 주기까지 영향이 가요",
+      dietPoint:"무리한 식단 조절보다는 유지에 집중해요. 억지로 감량하려 하면 스트레스 호르몬이 올라가 오히려 역효과가 날 수 있어요",
+    },
   },
   {
     id:"choseung", name:"초생", moon:"🌒", season:"회복기", dayRange:[6,9],
@@ -42,6 +49,13 @@ const PHASES = [
     },
     exercise:["가벼운 조깅·빠른 걷기 30분 — 에너지 회복에 맞춰 점진적으로","가벼운 근력 운동 — 에스트로겐 상승 시작, 근합성 효율 올라가는 시기","수영·자전거 — 전신 유산소, 부담 없이","필라테스 — 코어 강화, 몸의 균형 회복"],
     tips:["새 프로젝트·목표를 구상하기 시작하세요","수면이 아직 중요해요, 7-8시간 확보","몸이 서서히 깨어나는 중, 무리하지 않게","가벼운 사교 활동부터 시작하기 좋아요"],
+    bodyRhythm:{
+      intro:"생리가 끝나가면서 에스트로겐이 조금씩 올라오기 시작해요. 몸도 마음도 서서히 가벼워지는 회복기예요.",
+      hormone:"에스트로겐 서서히 상승 시작",
+      bodyTraits:"붓기 빠짐, 기분·에너지 회복",
+      exerciseTraits:"몸이 다시 움직일 준비를 시작하는 시기",
+      dietPoint:"식단 관리를 다시 시작하기 좋은 타이밍이에요. 컨디션이 안정되면서 습관을 리셋하기 좋아요",
+    },
   },
   {
     id:"sanghyun", name:"상현", moon:"🌓", season:"활력기", dayRange:[10,13],
@@ -55,6 +69,13 @@ const PHASES = [
     },
     exercise:["달리기·수영 30-45분 — 에스트로겐 최고조, 유산소 최적 시기","근력 운동 (스쿼트·데드리프트) — 에스트로겐 덕에 근육 합성 효율 최고","HIIT 20-30분 — 짧고 강하게, 대사 촉진","댄스·줌바 — 사교적 에너지와 운동 효과 동시에"],
     tips:["중요한 프로젝트·발표를 이 시기로 잡으면 유리해요","창의적 작업, 브레인스토밍에 에너지 집중","이 시기 운동 기록이 가장 좋게 나와요","새 기술·학습 시작하기 딱 좋은 때"],
+    bodyRhythm:{
+      intro:"에스트로겐이 빠르게 오르면서 컨디션이 가장 좋아지는 구간이에요. 근육을 만들고 싶다면 지금이 몸이 제일 잘 반응해줄 때예요.",
+      hormone:"에스트로겐 급상승",
+      bodyTraits:"집중력·에너지 최고조, 피부 컨디션 좋음",
+      exerciseTraits:"근육 단백질 합성이 활발해지는 시기, 근력운동 효율이 가장 좋아요",
+      dietPoint:"지금은 근육이 가장 잘 붙는 시기예요. 운동 강도를 조금 올려보면 몸이 잘 따라와줄 거예요",
+    },
   },
   {
     id:"boreum", name:"보름", moon:"🌕", season:"배란기", dayRange:[14,16],
@@ -68,6 +89,13 @@ const PHASES = [
     },
     exercise:["HIIT 30-40분 — 호르몬 최고조, 강도 높여도 회복 빠름","그룹 스포츠 (테니스·배구·농구) — 사교 에너지 폭발하는 시기","사이클링·달리기 인터벌 — 심폐 기능 강화","새 운동 클래스 도전 — 학습 능력도 피크, 동작 습득 빠름"],
     tips:["중요한 발표·협상·면접을 이 시기로 잡으면 유리해요","언어 능력·공감 능력 최고조, 소통이 필요한 일에 집중","자신감 있게 의사 표현하기 좋은 때","에너지 발산 위한 사회 활동 적극 계획"],
+    bodyRhythm:{
+      intro:"에스트로겐이 정점을 찍는 배란기예요. 몸의 퍼포먼스가 최고조에 달하지만, 관절이 살짝 느슨해지는 시기라 부상엔 조금 더 신경 써주면 좋아요.",
+      hormone:"에스트로겐 피크 + LH 서지",
+      bodyTraits:"자신감·활력 최고조, 사교성 상승",
+      exerciseTraits:"순발력과 파워는 최고, 다만 무릎·인대 부상 위험이 살짝 올라가요",
+      dietPoint:"운동 퍼포먼스가 최고치인 시기예요. 고강도 운동도 체감 피로가 적으니 운동량을 밀어붙이기 좋아요",
+    },
   },
   {
     id:"hahyun", name:"하현", moon:"🌖", season:"안정기", dayRange:[17,23],
@@ -79,8 +107,15 @@ const PHASES = [
       eat:["고구마·단호박·현미 — 복합탄수화물이 세로토닌 생성 촉진, 혈당 안정","닭고기·달걀·피스타치오 — 비타민B6로 세로토닌·멜라토닌 합성 지원","우유·치즈·두부·브로콜리 — 칼슘이 PMS 전조 증상 완화","바나나·아몬드·시금치 — 마그네슘으로 근육 이완, 수면 개선","캐모마일·라벤더차 — 불안 완화, 수면의 질 향상","연어·호두·치아씨드 — 오메가3로 염증 예방"],
       avoid:["카페인 음료 — 수면 방해, 불안감 증폭","알코올 — 프로게스테론 대사 방해, 수면의 질 저하","정제 탄수화물·흰빵 — 혈당 스파이크 후 기분 급변","짠 음식·가공육 — 부종 악화, PMS 전조"]
     },
-    exercise:["요가·필라테스 40-50분 — 코어 강화, 복부 팽만 완화","가벼운 유산소 (빠른 걷기·자전거) — 엔도르핀으로 기분 전환","자연 속 산책 30-40분 — 코르티솔 낮추고 마음 안정","스트레칭·폼롤링 — 긴장된 몸 풀어주기"],
+    exercise:["슬로우 조깅 30-40분 — 평소보다 페이스 낮추고 시간을 늘려 지방 연소 극대화","수영 — 관절 부담 없이 전신 지방 연소","오래 걷기 40-50분 — 강도보다 시간에 집중","가벼운 자전거 타기 — 편안한 속도로 오래","요가·필라테스 — 코어 강화, 복부 팽만 완화"],
     tips:["정리·마무리 작업에 집중하기 좋은 때","혼자만의 창의적 작업, 독서에 에너지 집중","취침 1시간 전 화면 끄고 수면의 질 챙기기","감정 일기 쓰기 — 내면 탐색의 좋은 기회"],
+    bodyRhythm:{
+      intro:"프로게스테론이 올라오기 시작하면서 체온이 살짝 오르고, 몸이 에너지를 지방에서 더 끌어다 쓰는 시기예요. 입맛이 조금씩 당기기 시작해도 자연스러운 변화예요.",
+      hormone:"프로게스테론 상승 시작",
+      bodyTraits:"체온 상승, 식욕 서서히 증가, 나트륨에 민감해짐",
+      exerciseTraits:"지방을 에너지원으로 잘 쓰는 구간이지만 관절·통증 민감도도 함께 올라가요 — 강도보다 시간을 늘리는 쪽이 유리해요",
+      dietPoint:"다이어트를 시도하고 있다면, 지금이 식단 관리 효과가 가장 잘 나타나는 시기예요. 조금만 신경 써도 몸이 반응을 잘 해줘요",
+    },
   },
   {
     id:"geumeum", name:"그믐", moon:"🌘", season:"PMS", dayRange:[24,28],
@@ -94,8 +129,17 @@ const PHASES = [
     },
     exercise:["스트레칭·음인 요가 — 몸이 무거울 때 무리 없이 이완","가벼운 산책 20-30분 — 엔도르핀 소량 분비로 기분 전환","명상·호흡 운동 — 예민한 신경계 안정","따뜻한 목욕 후 스트레칭 — 근육 이완, 수면 개선"],
     tips:["PMS는 자연스러운 신호예요, 몸을 탓하지 말고 돌봐주세요","중요한 결정과 감정적인 대화는 가능하면 미루세요","충분한 수면과 혼자만의 시간을 확보하세요","증상이 심하면 산부인과 상담을 권해요"],
+    bodyRhythm:{
+      intro:"다음 생리를 앞두고 프로게스테론이 우세해지고 에스트로겐은 뚝 떨어지는 시기예요. 세로토닌도 같이 줄어서 짜고 기름진 음식이 당기는 게 의지력 문제가 아니라 호르몬 때문이에요. 이 시기엔 몸을 다그치기보다 다독여주는 게 더 도움이 돼요.",
+      hormone:"프로게스테론 우세, 에스트로겐 급락",
+      bodyTraits:"식욕 폭발(단짠·기름진 음식), 집중력 저하, 예민함, 수분저류",
+      exerciseTraits:"근력 퍼포먼스가 살짝 떨어지는 시기, 회복에 집중하는 게 좋아요",
+      dietPoint:"식욕이 오르는 게 당연한 시기예요. 참기보다는 포만감 있는 음식으로 구성만 바꿔보는 게 더 도움이 돼요",
+    },
   },
 ];
+
+const BODY_RHYTHM_NOTE = "이 내용은 일반적인 생리주기 호르몬 변화 경향을 바탕으로 한 참고 정보이며, 개인의 몸 상태나 건강 이력, 대사, 활동량에 따라 다르게 나타날 수 있어요. 무리한 식단 제한보다는 몸의 리듬에 맞춰 조절하는 방식을 권하고, 증상이 심하거나 지속된다면 전문의와 상담해보시는 걸 추천해요.";
 
 const PHASE_SEASON_FOODS = {
   wolsik:{spring:["달래·냉이 — 철분+비타민C","바지락·주꾸미 — 타우린+철분 보충","딸기 — 비타민C로 철분 흡수 향상","봄동 — 엽산+칼슘, 자궁 회복 지원"],summer:["깻잎·낙지 — 철분+타우린","전복 — 아연+철분, 스태미나 보충","토마토·딸기 — 비타민C로 철분 흡수 향상","수박 — 수분+칼륨, 붓기 완화"],autumn:["연근·우엉 — 철분+식이섬유","갈치·꽁치 — 오메가3 (염증 완화)","사과·배 — 비타민C+식이섬유","버섯류 — 비타민D+셀레늄"],winter:["시금치 — 철분+마그네슘 (겨울 최고 철분원)","굴 — 아연+철분+타우린","귤·한라봉 — 비타민C로 철분 흡수 향상","꼬막 — 철분+단백질"]},
@@ -695,6 +739,71 @@ function loadNotifPrefs(){try{const r=localStorage.getItem(NOTIF_KEY);return r?J
 async function requestAndNotify(title,body){if(!("Notification" in window)){alert("이 브라우저는 알림을 지원하지 않아요");return;}let perm=Notification.permission;if(perm==="default")perm=await Notification.requestPermission();if(perm==="granted")new Notification(title,{body,icon:"/favicon.ico"});else alert("알림 권한이 거부됐어요.");}
 function Toggle({on,onChange}){return(<div onClick={()=>onChange(!on)} style={{width:44,height:24,borderRadius:12,flexShrink:0,cursor:"pointer",background:on?PHASES[1].color:"rgba(255,255,255,0.15)",position:"relative",transition:"background 0.2s"}}><div style={{position:"absolute",top:3,left:on?22:3,width:18,height:18,borderRadius:"50%",background:"white",boxShadow:"0 1px 4px rgba(0,0,0,0.3)",transition:"left 0.2s"}}/></div>);}
 
+function RhythmRow({label,value,color,highlight}){
+  return(
+    <div style={{background:highlight?"rgba(255,255,255,0.06)":C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:"12px 15px",display:"flex",gap:12,alignItems:"flex-start"}}>
+      <div style={{fontSize:11,fontWeight:700,color:color,flexShrink:0,width:70,paddingTop:1}}>{label}</div>
+      <div style={{fontSize:12.5,color:C.text,lineHeight:1.6}}>{value}</div>
+    </div>
+  );
+}
+
+function LunarRhythmView({stats}){
+  const[selId,setSelId]=useState(stats?.phase?.id||"wolsik");
+  const dp=PHASES.find(p=>p.id===selId)||PHASES[0];
+  return(
+    <div>
+      <div style={{fontSize:15,fontWeight:700,marginBottom:4,color:C.text}}>루나 바디 리듬</div>
+      <div style={{fontSize:11.5,color:C.muted,marginBottom:16,lineHeight:1.6}}>호르몬 흐름에 따라 달라지는 몸의 리듬을 한눈에 알아봐요</div>
+      <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:4,marginBottom:16,WebkitOverflowScrolling:"touch"}}>
+        {PHASES.map(p=>{
+          const on=p.id===selId;
+          return(
+            <button key={p.id} onClick={()=>setSelId(p.id)} style={{flexShrink:0,padding:"9px 15px",borderRadius:100,border:`1.5px solid ${on?p.border:C.border}`,background:on?p.soft:"transparent",color:on?p.text:C.muted,fontSize:12,fontWeight:700,whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:5,transition:"all 0.15s"}}>
+              <span style={{fontSize:14}}>{p.moon}</span>{p.name}
+            </button>
+          );
+        })}
+      </div>
+      {dp.bodyRhythm&&(
+        <>
+          <div style={{background:dp.soft,border:`1px solid ${dp.border}`,borderRadius:20,padding:"18px 18px 16px",marginBottom:14}}>
+            <div style={{display:"flex",alignItems:"center",gap:9,marginBottom:11}}>
+              <div style={{width:38,height:38,borderRadius:"50%",background:"rgba(255,255,255,0.08)",border:`2px solid ${dp.border}`,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{dp.moon}</div>
+              <div>
+                <div style={{fontSize:16,fontWeight:700,color:dp.text}}>{dp.name} · {dp.season}</div>
+                <div style={{fontSize:11,color:dp.text,opacity:0.75,marginTop:1}}>{dp.keyword}</div>
+              </div>
+            </div>
+            <p style={{fontSize:13,color:C.text,lineHeight:1.85,margin:0}}>{dp.bodyRhythm.intro}</p>
+          </div>
+
+          <div style={{display:"grid",gap:8,marginBottom:16}}>
+            <RhythmRow label="호르몬 추이" value={dp.bodyRhythm.hormone} color={dp.color}/>
+            <RhythmRow label="신체 특징" value={dp.bodyRhythm.bodyTraits} color={dp.color}/>
+            <RhythmRow label="운동 특징" value={dp.bodyRhythm.exerciseTraits} color={dp.color}/>
+            <RhythmRow label="다이어트" value={dp.bodyRhythm.dietPoint} color={dp.color} highlight/>
+          </div>
+
+          <div style={{marginBottom:16}}>
+            <div style={{fontSize:11.5,fontWeight:700,color:C.muted,marginBottom:9}}>추천 운동 (간략)</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+              {dp.exercise.map((e,i)=>{
+                const label=e.split(" — ")[0];
+                return <span key={i} style={{fontSize:12,color:dp.text,background:dp.soft,border:`1px solid ${dp.border}`,borderRadius:100,padding:"6px 12px"}}>{label}</span>;
+              })}
+            </div>
+          </div>
+        </>
+      )}
+      <div style={{padding:"14px 16px",background:"rgba(152,152,204,0.06)",borderRadius:14,border:`1px solid ${C.border}`}}>
+        <div style={{fontSize:11,fontWeight:700,color:C.text,marginBottom:7}}>⚠️ 참고</div>
+        <p style={{margin:0,fontSize:10.5,color:C.muted,lineHeight:1.75}}>{BODY_RHYTHM_NOTE}</p>
+      </div>
+    </div>
+  );
+}
+
 function MyPage({stats,periods,user}){
   const[prefs,setPrefs]=useState(loadNotifPrefs);
   const[editingKey,setEditingKey]=useState(null);
@@ -903,6 +1012,7 @@ export default function App(){
         <div style={{fontSize:22,color:C.text,lineHeight:1.2,fontWeight:200,letterSpacing:"0.05em"}}>Me:ll 🌙</div>
       </div>
       <div style={{padding:"16px 18px 0",maxWidth:460,margin:"0 auto",position:"relative",zIndex:1}}>
+        {tab==="rhythm"&&<LunarRhythmView stats={stats}/>}
         {tab==="dash"&&(
           !loaded?(
             <div style={{textAlign:"center",padding:"60px 0",color:C.muted,fontSize:13}}>불러오는 중...</div>
@@ -1004,7 +1114,7 @@ export default function App(){
         {tab==="my"&&<MyPage stats={stats} periods={periods} user={user}/>}
       </div>
       <div style={{position:"fixed",bottom:0,left:0,right:0,background:"rgba(7,7,30,0.92)",backdropFilter:"blur(12px)",borderTop:`1px solid ${C.border}`,display:"flex",zIndex:20}}>
-        {[{id:"dash",ic:"◯",lb:"대시보드"},{id:"cal",ic:"▦",lb:"캘린더"},{id:"record",ic:"✎",lb:"기록"},{id:"my",ic:"♡",lb:"마이페이지"}].map(t=>(
+        {[{id:"rhythm",ic:"◐",lb:"리듬"},{id:"dash",ic:"◯",lb:"대시보드"},{id:"cal",ic:"▦",lb:"캘린더"},{id:"record",ic:"✎",lb:"기록"},{id:"my",ic:"♡",lb:"마이페이지"}].map(t=>(
           <button key={t.id} onClick={()=>setTab(t.id)} style={{flex:1,padding:"9px 0 11px",border:"none",background:"transparent",color:tab===t.id?"white":C.muted,display:"flex",flexDirection:"column",alignItems:"center",gap:2,borderTop:tab===t.id?"2px solid rgba(255,255,255,0.6)":"2px solid transparent",transition:"all 0.15s"}}>
             <span style={{fontSize:15,lineHeight:1}}>{t.ic}</span>
             <span style={{fontSize:9.5,fontWeight:tab===t.id?700:500}}>{t.lb}</span>
