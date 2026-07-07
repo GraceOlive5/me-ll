@@ -681,27 +681,6 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
           <span style={{fontSize:10.5,color:C.muted}}>오늘</span>
         </div>
       </div>
-      {stats&&(
-        <div style={{marginTop:14}}>
-          <div style={{fontWeight:700,color:C.text,marginBottom:10,fontSize:13}}>이번 달 예측</div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
-            {[
-              {label:"다음\n생리",date:stats.nextPeriod,ph:PHASES[0],emoji:"🌑",dTo:stats.dToNext},
-              {label:"배란\n예정",date:stats.ovulation,ph:PHASES[3],emoji:"🌕",dTo:null},
-              {label:"가임기\n시작",date:stats.fertileStart,ph:PHASES[3],emoji:"🌿",dTo:stats.inFertile?null:stats.dToFertile},
-            ].map(s=>(
-              <div key={s.label} style={{background:s.ph.soft,borderRadius:16,padding:"14px 6px 12px",textAlign:"center",border:`1px solid ${s.ph.border}`,display:"flex",flexDirection:"column",alignItems:"center",gap:5,backdropFilter:"blur(6px) saturate(150%)",WebkitBackdropFilter:"blur(6px) saturate(150%)",boxShadow:"inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1.5px 3px rgba(0,0,0,0.12)"}}>
-                <span style={{fontSize:22,lineHeight:1}}>{s.emoji}</span>
-                <span style={{fontSize:10,color:s.ph.text,fontWeight:700,lineHeight:1.45,whiteSpace:"pre-line"}}>{s.label}</span>
-                <span style={{fontSize:12,color:s.ph.text,fontWeight:800,letterSpacing:"-0.02em"}}>{fmtKo(s.date)}</span>
-                {s.dTo!=null&&s.dTo>0&&<span style={{fontSize:10,color:s.ph.text,opacity:0.65,fontWeight:600}}>D-{s.dTo}</span>}
-                {s.dTo===0&&<span style={{fontSize:10,color:s.ph.text,fontWeight:700}}>오늘</span>}
-                {s.label.includes("가임기")&&stats.inFertile&&<span style={{fontSize:9.5,color:s.ph.text,fontWeight:700,background:`${s.ph.color}33`,borderRadius:100,padding:"2px 7px"}}>진행 중</span>}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
       {modal&&(
         <div onClick={()=>setModal(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",display:"flex",alignItems:"flex-end",zIndex:100}}>
           <div onClick={e=>e.stopPropagation()} style={{width:"100%",background:"#14143a",borderRadius:"20px 20px 0 0",padding:"20px 20px 36px",boxShadow:"0 -4px 24px rgba(0,0,0,0.4)"}}>
