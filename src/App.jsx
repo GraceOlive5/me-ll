@@ -39,7 +39,7 @@ const PHASES = [
   },
   {
     id:"choseung", name:"초생", moon:"🌒", season:"회복기", dayRange:[6,9],
-    color:"#5bbaa0", soft:"rgba(91,186,160,0.14)", border:"rgba(91,186,160,0.28)", text:"#7dd4bc",
+    color:"#4a9ec8", soft:"rgba(74,158,200,0.14)", border:"rgba(74,158,200,0.28)", text:"#89c0db",
     description:"달이 서서히 차오르는 시간. 에너지가 회복되며 몸이 깨어나기 시작해요.",
     keyword:"회복과 새로운 출발",
     nutrients:["단백질","아연","비타민B군","프로바이오틱스"],
@@ -99,7 +99,7 @@ const PHASES = [
   },
   {
     id:"hahyun", name:"하현", moon:"🌖", season:"안정기", dayRange:[17,23],
-    color:"#c08060", soft:"rgba(192,128,96,0.14)", border:"rgba(192,128,96,0.28)", text:"#d8a080",
+    color:"#d9506e", soft:"rgba(217,80,110,0.14)", border:"rgba(217,80,110,0.28)", text:"#e68da1",
     description:"달이 포근하게 기울기 시작하는 시간. 나에게로 돌아오는 시간. 안정적이고 내향적인 에너지예요.",
     keyword:"돌봄과 정리",
     nutrients:["복합탄수화물","칼슘","마그네슘","트립토판"],
@@ -119,7 +119,7 @@ const PHASES = [
   },
   {
     id:"geumeum", name:"그믐", moon:"🌘", season:"PMS", dayRange:[24,28],
-    color:"#b07060", soft:"rgba(176,112,96,0.14)", border:"rgba(176,112,96,0.28)", text:"#d09080",
+    color:"#9257ac", soft:"rgba(146,87,172,0.14)", border:"rgba(146,87,172,0.28)", text:"#b892c9",
     description:"달이 고요히 사라지기 직전. PMS 증상이 나타날 수 있어요. 몸이 보내는 신호에 귀를 기울이는 시간.",
     keyword:"내면과 고요",
     nutrients:["마그네슘","칼슘","비타민B6","오메가3","칼륨"],
