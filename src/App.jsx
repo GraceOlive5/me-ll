@@ -580,6 +580,24 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
     const isEnd=!phNext||phNext.id!==ph.id||dow===6;
     return{ph,isStart,isEnd,isPhaseStart};
   }
+  // 위상 색 밴드처럼, 가임기·배란도 특정 한 번이 아니라 매 사이클마다 반복 계산
+  function getFertileWindow(ds){
+    if(!periods.length)return null;
+    const sorted2=[...periods].sort((a,b)=>toDate(b.start)-toDate(a.start));
+    const refIdx=sorted2.findIndex(p=>p.start<=ds);
+    if(refIdx===-1)return null;
+    const ref=sorted2[refIdx];
+    const nextP=refIdx>0?sorted2[refIdx-1]:null;
+    let cycleLen=avgCycle;
+    if(nextP){const g=daysBetween(ref.start,nextP.start);if(g>=21&&g<=45)cycleLen=g;}
+    const daysSinceRef=daysBetween(ref.start,ds);
+    const cyclesElapsed=Math.floor(daysSinceRef/cycleLen);
+    const nextCycleStart=shiftDays(ref.start,(cyclesElapsed+1)*cycleLen);
+    const ovulation=shiftDays(nextCycleStart,-14);
+    const fertileStart=shiftDays(ovulation,-5);
+    const fertileEnd=shiftDays(ovulation,1);
+    return{ovulation,fertileStart,fertileEnd};
+  }
   function findNearbyPeriod(ds){return periods.find(p=>{const end=p.end||shiftDays(p.start,4);return Math.abs(daysBetween(end,ds))<=7&&ds>p.start;});}
   function handleDayTap(ds){const period=getPeriodForDay(ds);if(period){setModal({ds,mode:"menu",period});return;}const nearby=findNearbyPeriod(ds);setModal(nearby?{ds,mode:"edit",period:nearby}:{ds,mode:"action"});}
   function addStart(ds){setPeriods(prev=>[...prev,{id:Date.now(),start:ds,end:shiftDays(ds,avgDuration-1)}]);setModal(null);}
@@ -610,8 +628,9 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
           const periodRec=getPeriodForDay(ds);
           const inPeriod=!!periodRec;
           const isPeriodStart=periodRec&&ds===periodRec.start;
-          const inFertile=stats&&ds>=stats.fertileStart&&ds<=stats.fertileEnd;
-          const isOvu=stats&&ds===stats.ovulation;
+          const fw=getFertileWindow(ds);
+          const inFertile=fw&&ds>=fw.fertileStart&&ds<=fw.fertileEnd;
+          const isOvu=fw&&ds===fw.ovulation;
           const pp=getPhasePos(ds);
           const dow=toDate(ds).getDay();
           const prevDay=shiftDays(ds,-1),nextDay=shiftDays(ds,1);
