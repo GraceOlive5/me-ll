@@ -599,7 +599,7 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
         </div>
         <button onClick={()=>setCalMonth(new Date(yr,mo+1,1))} style={{background:"none",border:"none",fontSize:20,color:C.muted,padding:"4px 12px"}}>&#8250;</button>
       </div>
-      <div style={{fontSize:11,color:C.muted,marginBottom:12,textAlign:"center",background:PHASES[0].soft,borderRadius:10,padding:"7px 12px",border:`1px solid ${PHASES[0].border}`}}>날짜를 탭하면 생리·사랑 기록을 추가할 수 있어요</div>
+      <div style={{fontSize:11,color:C.muted,marginBottom:12,textAlign:"center",background:PHASES[0].soft,borderRadius:14,padding:"7px 12px",border:`1px solid ${PHASES[0].border}`,backdropFilter:"blur(6px)",WebkitBackdropFilter:"blur(6px)",boxShadow:"inset 0 1px 0 rgba(255,255,255,0.12)"}}>날짜를 탭하면 생리·사랑 기록을 추가할 수 있어요</div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",marginBottom:4}}>
         {["일","월","화","수","목","금","토"].map(d=><div key={d} style={{textAlign:"center",fontSize:10,fontWeight:700,color:C.muted,padding:"4px 0"}}>{d}</div>)}
       </div>
@@ -613,27 +613,28 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
           const inFertile=stats&&ds>=stats.fertileStart&&ds<=stats.fertileEnd;
           const isOvu=stats&&ds===stats.ovulation;
           const pp=getPhasePos(ds);
-          // 색상 및 border radius 결정
-          const rTL=(!pp||pp.isStart)?"8px":"0";
-          const rTR=(!pp||pp.isEnd)?"8px":"0";
-          const rBL=(!pp||pp.isStart)?"8px":"0";
-          const rBR=(!pp||pp.isEnd)?"8px":"0";
-          let finalBg,finalBdr,finalRad,finalCol;
+          // 색상 및 border radius 결정 — 젤리 느낌으로 더 통통하게
+          const rTL=(!pp||pp.isStart)?"14px":"0";
+          const rTR=(!pp||pp.isEnd)?"14px":"0";
+          const rBL=(!pp||pp.isStart)?"14px":"0";
+          const rBR=(!pp||pp.isEnd)?"14px":"0";
+          let finalBg,finalBdr,finalRad,finalCol,hasGlass=true;
           if(inPeriod){
-            finalBg=PHASES[0].soft;finalBdr=`1.5px solid ${PHASES[0].border}`;finalRad="8px";finalCol=PHASES[0].text;
+            finalBg=PHASES[0].soft;finalBdr=`1px solid ${PHASES[0].border}`;finalRad="14px";finalCol=PHASES[0].text;
           } else if(isOvu){
-            finalBg=PHASES[3].soft;finalBdr=`2px solid ${PHASES[3].color}`;finalRad="8px";finalCol=PHASES[3].text;
+            finalBg=PHASES[3].soft;finalBdr=`1.5px solid ${PHASES[3].color}`;finalRad="14px";finalCol=PHASES[3].text;
           } else if(inFertile){
-            finalBg="transparent";finalBdr=`1.5px dashed ${PHASES[3].color}`;finalRad="8px";finalCol=PHASES[3].text;
+            finalBg="rgba(212,160,80,0.06)";finalBdr=`1.5px dashed ${PHASES[3].color}`;finalRad="14px";finalCol=PHASES[3].text;
           } else if(pp){
-            finalBg=`${pp.ph.color}55`;finalBdr=`1px solid ${pp.ph.color}99`;finalRad=`${rTL} ${rTR} ${rBR} ${rBL}`;finalCol=pp.ph.text;
+            finalBg=pp.ph.soft;finalBdr=`1px solid ${pp.ph.border}`;finalRad=`${rTL} ${rTR} ${rBR} ${rBL}`;finalCol=pp.ph.text;
           } else {
-            finalBg="transparent";finalBdr="1px solid transparent";finalRad="8px";finalCol=C.text;
+            finalBg="transparent";finalBdr="1px solid transparent";finalRad="14px";finalCol=C.text;hasGlass=false;
           }
           if(isToday)finalBdr="2px solid rgba(255,255,255,0.75)";
+          const glassStyle=hasGlass?{backdropFilter:"blur(6px) saturate(150%)",WebkitBackdropFilter:"blur(6px) saturate(150%)",boxShadow:"inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1.5px 3px rgba(0,0,0,0.12)"}:{};
           return(
-            <div key={i} onClick={()=>handleDayTap(ds)}
-              style={{aspectRatio:"1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",borderRadius:finalRad,background:finalBg,border:finalBdr,cursor:"pointer",WebkitTapHighlightColor:"transparent",position:"relative",gap:0}}>
+            <div key={i} onClick={()=>handleDayTap(ds)} className="jelly-day"
+              style={{aspectRatio:"1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",borderRadius:finalRad,background:finalBg,border:finalBdr,cursor:"pointer",WebkitTapHighlightColor:"transparent",position:"relative",gap:0,...glassStyle}}>
               <span style={{fontSize:11,fontWeight:isToday?700:400,color:finalCol,lineHeight:1}}>{parseInt(ds.split("-")[2])}</span>
               {isPeriodStart&&<span style={{fontSize:10,color:PHASES[0].text,fontWeight:700,lineHeight:1.3}}>{PHASES[0].name}</span>}
               {pp?.isPhaseStart&&!inPeriod&&<span style={{fontSize:10,color:pp.ph.text,fontWeight:700,lineHeight:1.3}}>{pp.ph.name}</span>}
@@ -651,7 +652,7 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
               {label:"배란\n예정",date:stats.ovulation,ph:PHASES[3],emoji:"🌕",dTo:null},
               {label:"가임기\n시작",date:stats.fertileStart,ph:PHASES[3],emoji:"🌿",dTo:stats.inFertile?null:stats.dToFertile},
             ].map(s=>(
-              <div key={s.label} style={{background:s.ph.soft,borderRadius:14,padding:"14px 6px 12px",textAlign:"center",border:`1px solid ${s.ph.border}`,display:"flex",flexDirection:"column",alignItems:"center",gap:5}}>
+              <div key={s.label} style={{background:s.ph.soft,borderRadius:16,padding:"14px 6px 12px",textAlign:"center",border:`1px solid ${s.ph.border}`,display:"flex",flexDirection:"column",alignItems:"center",gap:5,backdropFilter:"blur(6px) saturate(150%)",WebkitBackdropFilter:"blur(6px) saturate(150%)",boxShadow:"inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1.5px 3px rgba(0,0,0,0.12)"}}>
                 <span style={{fontSize:22,lineHeight:1}}>{s.emoji}</span>
                 <span style={{fontSize:10,color:s.ph.text,fontWeight:700,lineHeight:1.45,whiteSpace:"pre-line"}}>{s.label}</span>
                 <span style={{fontSize:12,color:s.ph.text,fontWeight:800,letterSpacing:"-0.02em"}}>{fmtKo(s.date)}</span>
@@ -1003,7 +1004,7 @@ export default function App(){
 
   return(
     <div style={{minHeight:"100vh",color:C.text,fontFamily:"system-ui,sans-serif",paddingBottom:120,position:"relative"}}>
-      <style>{`*{box-sizing:border-box;margin:0;padding:0}button{cursor:pointer;font-family:inherit}select option{background:#14143a;color:#ede8f5}`}</style>
+      <style>{`*{box-sizing:border-box;margin:0;padding:0}button{cursor:pointer;font-family:inherit}select option{background:#14143a;color:#ede8f5}.jelly-day{transition:transform .12s ease,box-shadow .12s ease}.jelly-day:active{transform:scale(0.9)}`}</style>
       <StarField/>
       <div style={{padding:"16px 20px 13px",borderBottom:`1px solid ${C.border}`,background:"rgba(7,7,30,0.85)",backdropFilter:"blur(12px)",position:"sticky",top:0,zIndex:10,textAlign:"center"}}>
         <div style={{fontSize:9.5,color:C.muted,letterSpacing:"0.14em",textTransform:"uppercase",fontWeight:600,marginBottom:2}}>나에게로 돌아오는 시간</div>
