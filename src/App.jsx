@@ -571,9 +571,12 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
     const dow=toDate(ds).getDay();
     // 이전 날이 period인 경우도 밴드 시작으로 처리 (종료일 변경 후 연속성 유지)
     const prevInPeriod=!!getPeriodForDay(prevDay);
-    const isStart=!phPrev||phPrev.id!==ph.id||dow===0||prevInPeriod;
+    // 진짜 위상이 바뀐 지점인지 (라벨 표시 여부에만 사용)
+    const isPhaseStart=!phPrev||phPrev.id!==ph.id||prevInPeriod;
+    // 캘린더 줄(주) 경계에서의 모서리 처리 (시각적 밴드 모양에만 사용, 라벨과는 무관)
+    const isStart=isPhaseStart||dow===0;
     const isEnd=!phNext||phNext.id!==ph.id||dow===6;
-    return{ph,isStart,isEnd};
+    return{ph,isStart,isEnd,isPhaseStart};
   }
   function findNearbyPeriod(ds){return periods.find(p=>{const end=p.end||shiftDays(p.start,4);return Math.abs(daysBetween(end,ds))<=7&&ds>p.start;});}
   function handleDayTap(ds){const period=getPeriodForDay(ds);if(period){setModal({ds,mode:"menu",period});return;}const nearby=findNearbyPeriod(ds);setModal(nearby?{ds,mode:"edit",period:nearby}:{ds,mode:"action"});}
@@ -623,7 +626,7 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
             <div key={i} onClick={()=>handleDayTap(ds)}
               style={{aspectRatio:"1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",borderRadius:finalRad,background:finalBg,border:finalBdr,cursor:"pointer",WebkitTapHighlightColor:"transparent",position:"relative",gap:0}}>
               <span style={{fontSize:11,fontWeight:isToday?700:400,color:finalCol,lineHeight:1}}>{parseInt(ds.split("-")[2])}</span>
-              {pp?.isStart&&!inPeriod&&<span style={{fontSize:10,color:pp.ph.text,fontWeight:700,lineHeight:1.3}}>{pp.ph.name}</span>}
+              {pp?.isPhaseStart&&!inPeriod&&<span style={{fontSize:10,color:pp.ph.text,fontWeight:700,lineHeight:1.3}}>{pp.ph.name}</span>}
               {loveRecords.includes(ds)&&<span style={{fontSize:7,position:"absolute",top:1,right:2}}>❤️</span>}
             </div>
           );
