@@ -603,7 +603,7 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
       <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",marginBottom:4}}>
         {["일","월","화","수","목","금","토"].map(d=><div key={d} style={{textAlign:"center",fontSize:10,fontWeight:700,color:C.muted,padding:"4px 0"}}>{d}</div>)}
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:"2px 0"}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:"3px 2px"}}>
         {cells.map((ds,i)=>{
           if(!ds)return <div key={i}/>;
           const isToday=ds===today;
@@ -613,32 +613,37 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
           const inFertile=stats&&ds>=stats.fertileStart&&ds<=stats.fertileEnd;
           const isOvu=stats&&ds===stats.ovulation;
           const pp=getPhasePos(ds);
-          // 색상 및 border radius 결정 — 젤리 느낌으로 더 통통하게
-          const rTL=(!pp||pp.isStart)?"14px":"0";
-          const rTR=(!pp||pp.isEnd)?"14px":"0";
-          const rBL=(!pp||pp.isStart)?"14px":"0";
-          const rBR=(!pp||pp.isEnd)?"14px":"0";
-          let finalBg,finalBdr,finalRad,finalCol,hasGlass=true;
+          const dow=toDate(ds).getDay();
+          const prevDay=shiftDays(ds,-1),nextDay=shiftDays(ds,1);
+
+          // barPhase: 이 날짜가 속한 위상 (실제 기록된 생리는 월식으로 처리)
+          let barPhase=null,rowStart=true,rowEnd=true,labelShow=false;
           if(inPeriod){
-            finalBg=PHASES[0].soft;finalBdr=`1px solid ${PHASES[0].border}`;finalRad="14px";finalCol=PHASES[0].text;
-          } else if(isOvu){
-            finalBg=PHASES[3].soft;finalBdr=`1.5px solid ${PHASES[3].color}`;finalRad="14px";finalCol=PHASES[3].text;
-          } else if(inFertile){
-            finalBg="rgba(212,160,80,0.06)";finalBdr=`1.5px dashed ${PHASES[3].color}`;finalRad="14px";finalCol=PHASES[3].text;
+            barPhase=PHASES[0];
+            const periodPrev=!!getPeriodForDay(prevDay),periodNext=!!getPeriodForDay(nextDay);
+            rowStart=!periodPrev||dow===0; rowEnd=!periodNext||dow===6;
+            labelShow=isPeriodStart;
           } else if(pp){
-            finalBg=pp.ph.soft;finalBdr=`1px solid ${pp.ph.border}`;finalRad=`${rTL} ${rTR} ${rBR} ${rBL}`;finalCol=pp.ph.text;
-          } else {
-            finalBg="transparent";finalBdr="1px solid transparent";finalRad="14px";finalCol=C.text;hasGlass=false;
+            barPhase=pp.ph; rowStart=pp.isStart; rowEnd=pp.isEnd; labelShow=pp.isPhaseStart;
           }
-          if(isToday)finalBdr="2px solid rgba(255,255,255,0.75)";
-          const glassStyle=hasGlass?{backdropFilter:"blur(6px) saturate(150%)",WebkitBackdropFilter:"blur(6px) saturate(150%)",boxShadow:"inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1.5px 3px rgba(0,0,0,0.12)"}:{};
+
+          // 배경은 차분한 글래스 톤, 실제 위상 구분은 항상 선명한 하단 바(bar)가 담당
+          let cellBg="transparent",cellBorder="1px solid transparent";
+          if(barPhase){ cellBg=`${barPhase.color}2E`; cellBorder=`1px solid ${barPhase.color}59`; }
+          if(inFertile) cellBorder=`1.5px dashed ${PHASES[3].color}`;
+          if(isOvu) cellBorder=`2px solid ${PHASES[3].color}`;
+          if(isToday) cellBorder="2px solid rgba(255,255,255,0.8)";
+
+          const barRadius=`${rowStart?"6px":"0"} ${rowEnd?"6px":"0"} ${rowEnd?"6px":"0"} ${rowStart?"6px":"0"}`;
+
           return(
             <div key={i} onClick={()=>handleDayTap(ds)} className="jelly-day"
-              style={{aspectRatio:"1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",borderRadius:finalRad,background:finalBg,border:finalBdr,cursor:"pointer",WebkitTapHighlightColor:"transparent",position:"relative",gap:0,...glassStyle}}>
-              <span style={{fontSize:11,fontWeight:isToday?700:400,color:finalCol,lineHeight:1}}>{parseInt(ds.split("-")[2])}</span>
-              {isPeriodStart&&<span style={{fontSize:10,color:PHASES[0].text,fontWeight:700,lineHeight:1.3}}>{PHASES[0].name}</span>}
-              {pp?.isPhaseStart&&!inPeriod&&<span style={{fontSize:10,color:pp.ph.text,fontWeight:700,lineHeight:1.3}}>{pp.ph.name}</span>}
-              {loveRecords.includes(ds)&&<span style={{fontSize:7,position:"absolute",top:1,right:2}}>❤️</span>}
+              style={{aspectRatio:"1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",borderRadius:14,background:cellBg,border:cellBorder,cursor:"pointer",WebkitTapHighlightColor:"transparent",position:"relative",gap:1,backdropFilter:barPhase?"blur(5px)":"none",WebkitBackdropFilter:barPhase?"blur(5px)":"none",overflow:"hidden",padding:"2px 0 6px"}}>
+              <span style={{fontSize:11,fontWeight:isToday?700:500,color:isToday?"#ffffff":C.text,lineHeight:1}}>{parseInt(ds.split("-")[2])}</span>
+              {labelShow&&<span style={{fontSize:9,color:barPhase.text,fontWeight:700,lineHeight:1.2}}>{barPhase.name}</span>}
+              {barPhase&&<div style={{position:"absolute",left:0,right:0,bottom:0,height:4,background:barPhase.color,borderRadius:barRadius}}/>}
+              {isOvu&&<span style={{position:"absolute",top:2,right:3,width:5,height:5,borderRadius:"50%",background:PHASES[3].color}}/>}
+              {loveRecords.includes(ds)&&<span style={{fontSize:7,position:"absolute",top:1,left:3}}>❤️</span>}
             </div>
           );
         })}
