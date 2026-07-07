@@ -589,7 +589,12 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
     <div>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
         <button onClick={()=>setCalMonth(new Date(yr,mo-1,1))} style={{background:"none",border:"none",fontSize:20,color:C.muted,padding:"4px 12px"}}>&#8249;</button>
-        <div style={{fontSize:15,fontWeight:700,color:C.text}}>{yr}년 {mo+1}월</div>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <div style={{fontSize:15,fontWeight:700,color:C.text}}>{yr}년 {mo+1}월</div>
+          {(yr!==new Date().getFullYear()||mo!==new Date().getMonth())&&(
+            <button onClick={()=>setCalMonth(new Date())} style={{padding:"4px 11px",background:"rgba(152,152,204,0.15)",border:`1px solid ${PHASES[0].border}`,borderRadius:100,color:C.text,fontSize:11,fontWeight:600}}>오늘</button>
+          )}
+        </div>
         <button onClick={()=>setCalMonth(new Date(yr,mo+1,1))} style={{background:"none",border:"none",fontSize:20,color:C.muted,padding:"4px 12px"}}>&#8250;</button>
       </div>
       <div style={{fontSize:11,color:C.muted,marginBottom:12,textAlign:"center",background:PHASES[0].soft,borderRadius:10,padding:"7px 12px",border:`1px solid ${PHASES[0].border}`}}>날짜를 탭하면 생리·사랑 기록을 추가할 수 있어요</div>
@@ -600,7 +605,9 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
         {cells.map((ds,i)=>{
           if(!ds)return <div key={i}/>;
           const isToday=ds===today;
-          const inPeriod=!!getPeriodForDay(ds);
+          const periodRec=getPeriodForDay(ds);
+          const inPeriod=!!periodRec;
+          const isPeriodStart=periodRec&&ds===periodRec.start;
           const inFertile=stats&&ds>=stats.fertileStart&&ds<=stats.fertileEnd;
           const isOvu=stats&&ds===stats.ovulation;
           const pp=getPhasePos(ds);
@@ -626,6 +633,7 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
             <div key={i} onClick={()=>handleDayTap(ds)}
               style={{aspectRatio:"1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",borderRadius:finalRad,background:finalBg,border:finalBdr,cursor:"pointer",WebkitTapHighlightColor:"transparent",position:"relative",gap:0}}>
               <span style={{fontSize:11,fontWeight:isToday?700:400,color:finalCol,lineHeight:1}}>{parseInt(ds.split("-")[2])}</span>
+              {isPeriodStart&&<span style={{fontSize:10,color:PHASES[0].text,fontWeight:700,lineHeight:1.3}}>{PHASES[0].name}</span>}
               {pp?.isPhaseStart&&!inPeriod&&<span style={{fontSize:10,color:pp.ph.text,fontWeight:700,lineHeight:1.3}}>{pp.ph.name}</span>}
               {loveRecords.includes(ds)&&<span style={{fontSize:7,position:"absolute",top:1,right:2}}>❤️</span>}
             </div>
