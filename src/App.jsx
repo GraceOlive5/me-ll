@@ -748,57 +748,42 @@ function RhythmRow({label,value,color,highlight}){
   );
 }
 
-function LunarRhythmView({stats}){
-  const[selId,setSelId]=useState(stats?.phase?.id||"wolsik");
-  const dp=PHASES.find(p=>p.id===selId)||PHASES[0];
+function RhythmListRow({label,items,color}){
   return(
-    <div>
-      <div style={{fontSize:15,fontWeight:700,marginBottom:4,color:C.text}}>루나 바디 리듬</div>
-      <div style={{fontSize:11.5,color:C.muted,marginBottom:16,lineHeight:1.6}}>호르몬 흐름에 따라 달라지는 몸의 리듬을 한눈에 알아봐요</div>
-      <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:4,marginBottom:16,WebkitOverflowScrolling:"touch"}}>
-        {PHASES.map(p=>{
-          const on=p.id===selId;
+    <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:"12px 15px",display:"flex",gap:12,alignItems:"flex-start"}}>
+      <div style={{fontSize:11,fontWeight:700,color:color,flexShrink:0,width:70,paddingTop:1}}>{label}</div>
+      <ul style={{paddingLeft:0,listStyle:"none",margin:0,flex:1}}>
+        {items.map((t,i)=>{
+          const parts=t.split(" — ");
           return(
-            <button key={p.id} onClick={()=>setSelId(p.id)} style={{flexShrink:0,padding:"9px 15px",borderRadius:100,border:`1.5px solid ${on?p.border:C.border}`,background:on?p.soft:"transparent",color:on?p.text:C.muted,fontSize:12,fontWeight:700,whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:5,transition:"all 0.15s"}}>
-              <span style={{fontSize:14}}>{p.moon}</span>{p.name}
-            </button>
+            <li key={i} style={{display:"flex",alignItems:"flex-start",gap:7,padding:i===0?"0 0 6px":"6px 0 0",borderTop:i>0?`1px solid ${C.border}`:"none"}}>
+              <span style={{width:4,height:4,borderRadius:"50%",background:color,flexShrink:0,marginTop:6}}/>
+              <div>
+                <div style={{fontSize:12.5,color:C.text,lineHeight:1.5}}>{parts[0]}</div>
+                {parts[1]&&<div style={{fontSize:11,color:C.muted,marginTop:1,lineHeight:1.5}}>{parts[1]}</div>}
+              </div>
+            </li>
           );
         })}
+      </ul>
+    </div>
+  );
+}
+
+function BodyRhythmPanel({dp}){
+  if(!dp?.bodyRhythm)return null;
+  return(
+    <div>
+      <p style={{fontSize:13,color:C.text,lineHeight:1.85,margin:"0 0 14px"}}>{dp.bodyRhythm.intro}</p>
+      <div style={{display:"grid",gap:8,marginBottom:12}}>
+        <RhythmRow label="호르몬 추이" value={dp.bodyRhythm.hormone} color={dp.color}/>
+        <RhythmRow label="신체 특징" value={dp.bodyRhythm.bodyTraits} color={dp.color}/>
+        <RhythmRow label="운동 특징" value={dp.bodyRhythm.exerciseTraits} color={dp.color}/>
+        <RhythmRow label="다이어트" value={dp.bodyRhythm.dietPoint} color={dp.color} highlight/>
+        {dp.tips&&<RhythmListRow label="유의사항" items={dp.tips} color={dp.color}/>}
       </div>
-      {dp.bodyRhythm&&(
-        <>
-          <div style={{background:dp.soft,border:`1px solid ${dp.border}`,borderRadius:20,padding:"18px 18px 16px",marginBottom:14}}>
-            <div style={{display:"flex",alignItems:"center",gap:9,marginBottom:11}}>
-              <div style={{width:38,height:38,borderRadius:"50%",background:"rgba(255,255,255,0.08)",border:`2px solid ${dp.border}`,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{dp.moon}</div>
-              <div>
-                <div style={{fontSize:16,fontWeight:700,color:dp.text}}>{dp.name} · {dp.season}</div>
-                <div style={{fontSize:11,color:dp.text,opacity:0.75,marginTop:1}}>{dp.keyword}</div>
-              </div>
-            </div>
-            <p style={{fontSize:13,color:C.text,lineHeight:1.85,margin:0}}>{dp.bodyRhythm.intro}</p>
-          </div>
-
-          <div style={{display:"grid",gap:8,marginBottom:16}}>
-            <RhythmRow label="호르몬 추이" value={dp.bodyRhythm.hormone} color={dp.color}/>
-            <RhythmRow label="신체 특징" value={dp.bodyRhythm.bodyTraits} color={dp.color}/>
-            <RhythmRow label="운동 특징" value={dp.bodyRhythm.exerciseTraits} color={dp.color}/>
-            <RhythmRow label="다이어트" value={dp.bodyRhythm.dietPoint} color={dp.color} highlight/>
-          </div>
-
-          <div style={{marginBottom:16}}>
-            <div style={{fontSize:11.5,fontWeight:700,color:C.muted,marginBottom:9}}>추천 운동 (간략)</div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
-              {dp.exercise.map((e,i)=>{
-                const label=e.split(" — ")[0];
-                return <span key={i} style={{fontSize:12,color:dp.text,background:dp.soft,border:`1px solid ${dp.border}`,borderRadius:100,padding:"6px 12px"}}>{label}</span>;
-              })}
-            </div>
-          </div>
-        </>
-      )}
-      <div style={{padding:"14px 16px",background:"rgba(152,152,204,0.06)",borderRadius:14,border:`1px solid ${C.border}`}}>
-        <div style={{fontSize:11,fontWeight:700,color:C.text,marginBottom:7}}>⚠️ 참고</div>
-        <p style={{margin:0,fontSize:10.5,color:C.muted,lineHeight:1.75}}>{BODY_RHYTHM_NOTE}</p>
+      <div style={{padding:"12px 14px",background:"rgba(152,152,204,0.06)",borderRadius:12,border:`1px solid ${C.border}`}}>
+        <p style={{margin:0,fontSize:10,color:C.muted,lineHeight:1.7}}>⚠️ {BODY_RHYTHM_NOTE}</p>
       </div>
     </div>
   );
@@ -942,7 +927,7 @@ export default function App(){
   const[periods,setPeriods]=useState([]);
   const[loaded,setLoaded]=useState(false);
   const[tab,setTab]=useState("dash");
-  const[sec,setSec]=useState("tips");
+  const[sec,setSec]=useState("rhythm");
   const[selId,setSelId]=useState(null);
   const[loveRecords,setLoveRecords]=useState([]);
   const[ready,setReady]=useState(false);
@@ -991,10 +976,10 @@ export default function App(){
   const dp=isToday?stats?.phase:PHASES.find(p=>p.id===selId);
   const seasonInfo=getActualSeason();
 
-  function togglePhase(id){setSelId(prev=>prev===id?null:id);setSec("tips");}
-  function backToday(){setSelId(null);setSec("tips");}
+  function togglePhase(id){setSelId(prev=>prev===id?null:id);setSec("rhythm");}
+  function backToday(){setSelId(null);setSec("rhythm");}
 
-  const SECS={tips:{l1:"유의",l2:"사항",data:dp?.tips},eat:{l1:"먹어야",l2:"할 것",data:dp?.foods?.eat},avoid:{l1:"피해야",l2:"할 것",data:dp?.foods?.avoid},exercise:{l1:"추천",l2:"운동",data:dp?.exercise}};
+  const SECS={rhythm:{l1:"루나",l2:"바디리듬"},eat:{l1:"먹어야",l2:"할 것",data:dp?.foods?.eat},avoid:{l1:"피해야",l2:"할 것",data:dp?.foods?.avoid},exercise:{l1:"추천",l2:"운동",data:dp?.exercise}};
 
   if(user===undefined){
     return(<div style={{minHeight:"100vh",background:"#07071e",display:"flex",alignItems:"center",justifyContent:"center"}}><StarField/><div style={{fontSize:13,color:"rgba(255,255,255,0.4)",position:"relative",zIndex:1}}>불러오는 중...</div></div>);
@@ -1012,7 +997,6 @@ export default function App(){
         <div style={{fontSize:22,color:C.text,lineHeight:1.2,fontWeight:200,letterSpacing:"0.05em"}}>Me:ll 🌙</div>
       </div>
       <div style={{padding:"16px 18px 0",maxWidth:460,margin:"0 auto",position:"relative",zIndex:1}}>
-        {tab==="rhythm"&&<LunarRhythmView stats={stats}/>}
         {tab==="dash"&&(
           !loaded?(
             <div style={{textAlign:"center",padding:"60px 0",color:C.muted,fontSize:13}}>불러오는 중...</div>
@@ -1061,6 +1045,9 @@ export default function App(){
                     })}
                   </div>
                   <div style={{background:"rgba(255,255,255,0.04)",border:`1.5px solid ${dp.border}`,borderTop:"none",borderRadius:"0 0 16px 16px",padding:"14px 18px"}}>
+                    {sec==="rhythm"?(
+                      <BodyRhythmPanel dp={dp}/>
+                    ):(
                     <ul style={{paddingLeft:0,listStyle:"none",margin:0}}>
                       {(SECS[sec]?.data||[]).map((t,i)=>{
                         const parts=t.split(" — ");
@@ -1070,6 +1057,7 @@ export default function App(){
                         </li>);
                       })}
                     </ul>
+                    )}
                     {(sec==="eat"||sec==="exercise")&&(
                       <div style={{marginTop:14,paddingTop:12,borderTop:`1px dashed ${seasonInfo.border}`}}>
                         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8,gap:8}}>
@@ -1114,7 +1102,7 @@ export default function App(){
         {tab==="my"&&<MyPage stats={stats} periods={periods} user={user}/>}
       </div>
       <div style={{position:"fixed",bottom:0,left:0,right:0,background:"rgba(7,7,30,0.92)",backdropFilter:"blur(12px)",borderTop:`1px solid ${C.border}`,display:"flex",zIndex:20}}>
-        {[{id:"rhythm",ic:"◐",lb:"리듬"},{id:"dash",ic:"◯",lb:"대시보드"},{id:"cal",ic:"▦",lb:"캘린더"},{id:"record",ic:"✎",lb:"기록"},{id:"my",ic:"♡",lb:"마이페이지"}].map(t=>(
+        {[{id:"dash",ic:"◯",lb:"대시보드"},{id:"cal",ic:"▦",lb:"캘린더"},{id:"record",ic:"✎",lb:"기록"},{id:"my",ic:"♡",lb:"마이페이지"}].map(t=>(
           <button key={t.id} onClick={()=>setTab(t.id)} style={{flex:1,padding:"9px 0 11px",border:"none",background:"transparent",color:tab===t.id?"white":C.muted,display:"flex",flexDirection:"column",alignItems:"center",gap:2,borderTop:tab===t.id?"2px solid rgba(255,255,255,0.6)":"2px solid transparent",transition:"all 0.15s"}}>
             <span style={{fontSize:15,lineHeight:1}}>{t.ic}</span>
             <span style={{fontSize:9.5,fontWeight:tab===t.id?700:500}}>{t.lb}</span>
