@@ -554,8 +554,10 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
     let cycleLen=avgCycle;
     if(nextP){const g=daysBetween(ref.start,nextP.start);if(g>=21&&g<=45)cycleLen=g;}
     let dayInCycle=daysBetween(ref.start,ds)%cycleLen+1;
-    // 생리 종료 후에는 최소 초생(6일)부터 — 종료일이 짧으면 바로 회복기로
-    if(ref.end&&ds>ref.end){
+    const rawDiff=daysBetween(ref.start,ds);
+    // 생리 종료 후에는 최소 초생(6일)부터 — 단, 이 보정은 같은 사이클 안에서만 적용
+    // (rawDiff가 cycleLen을 넘어서면 다음 사이클로 넘어간 것이므로 월식이 다시 나와야 함)
+    if(ref.end&&ds>ref.end&&rawDiff<cycleLen){
       dayInCycle=Math.max(dayInCycle,PHASES[1].dayRange[0]);
     }
     return phaseFromDay(Math.min(dayInCycle,28));
