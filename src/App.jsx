@@ -667,6 +667,20 @@ function CalView({periods,stats,setPeriods,loveRecords,setLoveRecords}){
           );
         })}
       </div>
+      <div style={{display:"flex",gap:16,marginTop:12,padding:"8px 4px",flexWrap:"wrap"}}>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <div style={{width:14,height:14,borderRadius:5,border:`1.5px dashed ${PHASES[3].color}`,flexShrink:0}}/>
+          <span style={{fontSize:10.5,color:C.muted}}>가임기</span>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <div style={{width:14,height:14,borderRadius:5,border:`2px solid ${PHASES[3].color}`,flexShrink:0}}/>
+          <span style={{fontSize:10.5,color:C.muted}}>배란 예정일</span>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <div style={{width:14,height:14,borderRadius:5,border:"2px solid rgba(255,255,255,0.8)",flexShrink:0}}/>
+          <span style={{fontSize:10.5,color:C.muted}}>오늘</span>
+        </div>
+      </div>
       {stats&&(
         <div style={{marginTop:14}}>
           <div style={{fontWeight:700,color:C.text,marginBottom:10,fontSize:13}}>이번 달 예측</div>
